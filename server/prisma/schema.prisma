@@ -1,0 +1,289 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
+  MANAGER
+  SUPPORT
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model User {
+  id              String    @id @default(cuid())
+  name            String
+  email           String    @unique
+  password        String? // null for OAuth-only accounts
+  role            Role      @default(CUSTOMER)
+  avatarUrl       String?
+  phone           String?
+  googleId        String?   @unique
+  facebookId      String?   @unique
+  emailVerified   Boolean   @default(false)
+  otpCode         String?
+  otpExpiresAt    DateTime?
+  resetToken      String?
+  resetTokenExpiresAt DateTime?
+  status          String    @default("active") // active | blocked
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  addresses       Address[]
+  orders          Order[]
+  reviews         Review[]
+  wishlist        WishlistItem[]
+  notifications   Notification[]
+  cartItems       CartItem[]
+}
+
+model Category {
+  id        String     @id @default(cuid())
+  name      String
+  slug      String     @unique
+  icon      String? // emoji or icon key, shown for main categories
+  image     String? // subcategory thumbnail
+  banner    String? // main category page hero banner
+  isActive  Boolean    @default(true)
+  sortOrder Int        @default(0)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  parentId  String?
+  parent    Category?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children  Category[] @relation("CategoryTree")
+
+  products  Product[]
+
+  @@index([parentId])
+}
+
+model Brand {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  logoUrl   String?
+  createdAt DateTime  @default(now())
+
+  products  Product[]
+}
+
+model Product {
+  id               String    @id @default(cuid())
+  name             String
+  subtitle         String?
+  slug             String    @unique
+  shortDescription String?   @db.Text
+  description      String    @db.Text
+  richContent      String?   @db.LongText // rich HTML body
+  price            Decimal   @db.Decimal(10, 2)
+  oldPrice         Decimal?  @db.Decimal(10, 2)
+  deliveryCharge   Decimal   @default(0) @db.Decimal(10, 2)
+  vat              Decimal   @default(0) @db.Decimal(10, 2)
+  stock            Int       @default(0)
+  sku              String?   @unique
+  productCode      String?
+  weight           Float?
+  material         String?
+  warranty         String?
+  returnPolicy     String?   @db.Text
+  thumbnail        String?
+  images           Json // string[]
+  video            String?
+  colors           Json? // { name, hex }[]
+  sizes            Json? // string[]
+  tags             Json? // string[]
+  rating           Float     @default(0)
+  reviewCount      Int       @default(0)
+  isActive         Boolean   @default(true)
+  isFeatured       Boolean   @default(false)
+  isBestSeller     Boolean   @default(false)
+  isNewArrival     Boolean   @default(false)
+  seoTitle         String?
+  seoDescription   String?   @db.Text
+  metaKeywords     String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  categoryId       String
+  category         Category  @relation(fields: [categoryId], references: [id])
+  brandId          String
+  brand            Brand     @relation(fields: [brandId], references: [id])
+
+  reviews          Review[]
+  wishlistedBy     WishlistItem[]
+  orderItems       OrderItem[]
+  cartItems        CartItem[]
+
+  @@index([categoryId])
+  @@index([brandId])
+  @@index([isFeatured])
+  @@index([isBestSeller])
+  @@index([isNewArrival])
+}
+
+model Review {
+  id          String        @id @default(cuid())
+  rating      Int
+  title       String
+  body        String        @db.Text
+  status      ReviewStatus  @default(PENDING)
+  verified    Boolean       @default(false)
+  createdAt   DateTime      @default(now())
+
+  userId      String
+  user        User          @relation(fields: [userId], references: [id])
+  productId   String
+  product     Product       @relation(fields: [productId], references: [id])
+
+  @@index([productId])
+}
+
+model Address {
+  id         String   @id @default(cuid())
+  label      String   @default("Home")
+  fullName   String
+  line1      String
+  city       String
+  zip        String
+  country    String
+  phone      String
+  isDefault  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+}
+
+model CartItem {
+  id         String   @id @default(cuid())
+  quantity   Int      @default(1)
+  color      String?
+  size       String?
+  createdAt  DateTime @default(now())
+
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id])
+
+  @@unique([userId, productId, color, size])
+}
+
+model WishlistItem {
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id])
+
+  @@unique([userId, productId])
+}
+
+model Order {
+  id              String        @id @default(cuid())
+  status          OrderStatus   @default(PENDING)
+  paymentStatus   PaymentStatus @default(PENDING)
+  subtotal        Decimal       @db.Decimal(10, 2)
+  discount        Decimal       @default(0) @db.Decimal(10, 2)
+  shipping        Decimal       @default(0) @db.Decimal(10, 2)
+  tax             Decimal       @default(0) @db.Decimal(10, 2)
+  total           Decimal       @db.Decimal(10, 2)
+  couponCode      String?
+  shippingAddress Json
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  userId          String
+  user            User          @relation(fields: [userId], references: [id])
+  items           OrderItem[]
+
+  @@index([userId])
+}
+
+model OrderItem {
+  id         String   @id @default(cuid())
+  quantity   Int
+  price      Decimal  @db.Decimal(10, 2)
+  color      String?
+  size       String?
+
+  orderId    String
+  order      Order    @relation(fields: [orderId], references: [id])
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id])
+}
+
+model Coupon {
+  id           String   @id @default(cuid())
+  code         String   @unique
+  type         String // percent | fixed
+  discount     Float
+  maxUses      Int?
+  usageCount   Int      @default(0)
+  active       Boolean  @default(true)
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+}
+
+model Banner {
+  id        String   @id @default(cuid())
+  title     String
+  subtitle  String?
+  image     String
+  link      String?
+  active    Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model SearchPlaceholder {
+  id        String   @id @default(cuid())
+  text      String
+  isActive  Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  type      String // order | promo | wishlist | system
+  title     String
+  body      String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}

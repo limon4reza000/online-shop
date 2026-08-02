@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="bn">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>নিত্যঘর — প্রিমিয়াম ফ্যাশন ও লাইফস্টাইল</title>
+    <meta name="description" content="নিত্যঘরে পান প্রিমিয়াম ফ্যাশন, কিউরেটেড ক্যাপসুল এবং চিরন্তন এসেনশিয়ালস।" />
+    <script>
+      (function () {
+        var stored = localStorage.getItem('shop-theme-v1');
+        var isDark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (isDark) document.documentElement.classList.add('dark');
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
