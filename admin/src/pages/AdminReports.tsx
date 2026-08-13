@@ -8,7 +8,6 @@ import { useSalesReport, useCategorySales, useWeeklyProfit, useTopProducts } fro
 import { useScrollTrack } from '@/hooks/useScrollTrack';
 
 function ChartScrollBar({ thumbWidth, thumbLeft }: { thumbWidth: number; thumbLeft: number }) {
-  if (thumbWidth >= 100) return null;
   return (
     <div className="mt-2 h-1.5 rounded-full bg-primary-light overflow-hidden" style={{ marginLeft: 56 }}>
       <div className="h-full bg-primary rounded-full" style={{ width: `${thumbWidth}%`, marginLeft: `${thumbLeft}%` }} />
