@@ -15,12 +15,15 @@ export const createOrderSchema = z.object({
   total: z.number().nonnegative(),
   couponCode: z.string().optional(),
   shippingAddress: z.object({
-    fullName: z.string(),
-    line1: z.string(),
-    city: z.string(),
-    zip: z.string(),
-    country: z.string(),
-    phone: z.string(),
+    fullName: z.string().trim().min(1, 'পূর্ণ নাম আবশ্যক'),
+    phone: z.string().trim().regex(/^01[3-9]\d{8}$/, 'সঠিক বাংলাদেশি মোবাইল নম্বর দিন'),
+    address: z.string().trim().min(1, 'ঠিকানা আবশ্যক'),
+    village: z.string().trim().min(1, 'গ্রাম/এলাকা আবশ্যক'),
+    postOffice: z.string().trim().min(1, 'পোস্ট অফিস আবশ্যক'),
+    upazila: z.string().trim().min(1, 'উপজেলা আবশ্যক'),
+    district: z.string().trim().min(1, 'জেলা আবশ্যক'),
+    division: z.string().trim().min(1, 'বিভাগ আবশ্যক'),
+    note: z.string().optional(),
   }),
 });
 

@@ -1,7 +1,19 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { CartItem } from '@/lib/types';
-import { products } from '@/lib/data';
+import { useProducts } from '@/hooks/useProducts';
 import { useToast } from './ToastContext';
+
+export interface ShippingDetails {
+  fullName: string;
+  mobile: string;
+  address: string;
+  village: string;
+  postOffice: string;
+  upazila: string;
+  district: string;
+  division: string;
+  note?: string;
+}
 
 interface CartContextValue {
   items: CartItem[];
@@ -17,10 +29,14 @@ interface CartContextValue {
   discount: number;
   applyCoupon: (code: string) => boolean;
   removeCoupon: () => void;
+  shippingDetails: ShippingDetails | null;
+  setShippingDetails: (details: ShippingDetails) => void;
+  clearShippingDetails: () => void;
 }
 
 const CartContext = createContext<CartContextValue | null>(null);
 const STORAGE_KEY = 'shop-cart-v1';
+const SHIPPING_STORAGE_KEY = 'shop-shipping-details-v1';
 
 const VALID_COUPONS: Record<string, number> = { WELCOME10: 0.1, PINK20: 0.2, SAVE15: 0.15 };
 
@@ -34,23 +50,53 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   });
   const [coupon, setCoupon] = useState<string | null>(null);
+  const [shippingDetails, setShippingDetailsState] = useState<ShippingDetails | null>(() => {
+    try {
+      const raw = localStorage.getItem(SHIPPING_STORAGE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  });
   const { showToast } = useToast();
+  const { data: products = [] } = useProducts();
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
   }, [items]);
 
+  const setShippingDetails = (details: ShippingDetails) => {
+    setShippingDetailsState(details);
+    localStorage.setItem(SHIPPING_STORAGE_KEY, JSON.stringify(details));
+  };
+
+  // Drop cart entries whose product was deleted/deactivated since it was added —
+  // otherwise the cart badge count and the (product-filtered) cart page disagree.
+  useEffect(() => {
+    if (products.length === 0) return;
+    setItems((prev) => {
+      const valid = prev.filter((i) => products.some((p) => p.id === i.productId));
+      return valid.length === prev.length ? prev : valid;
+    });
+  }, [products]);
+
   const addItem = (item: CartItem) => {
+    const stock = products.find((p) => p.id === item.productId)?.stock;
+    let clamped = false;
     setItems((prev) => {
       const idx = prev.findIndex((i) => i.productId === item.productId && i.color === item.color && i.size === item.size);
       if (idx > -1) {
         const next = [...prev];
-        next[idx] = { ...next[idx], quantity: next[idx].quantity + item.quantity };
+        let quantity = next[idx].quantity + item.quantity;
+        if (stock !== undefined && quantity > stock) { quantity = stock; clamped = true; }
+        next[idx] = { ...next[idx], quantity };
         return next;
       }
-      return [...prev, item];
+      let quantity = item.quantity;
+      if (stock !== undefined && quantity > stock) { quantity = stock; clamped = true; }
+      return [...prev, { ...item, quantity }];
     });
-    showToast('কার্টে যোগ করা হয়েছে', 'success');
+    showToast(clamped ? 'সর্বোচ্চ স্টক অনুযায়ী পরিমাণ সীমিত করা হয়েছে' : 'কার্টে যোগ করা হয়েছে', clamped ? 'info' : 'success');
   };
 
   const removeItem = (productId: string, color?: string, size?: string) => {
@@ -58,14 +104,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
   };
 
   const updateQuantity = (productId: string, quantity: number, color?: string, size?: string) => {
+    const stock = products.find((p) => p.id === productId)?.stock;
+    const capped = stock !== undefined ? Math.min(quantity, stock) : quantity;
     setItems((prev) =>
       prev.map((i) =>
-        i.productId === productId && i.color === color && i.size === size ? { ...i, quantity: Math.max(1, quantity) } : i
+        i.productId === productId && i.color === color && i.size === size ? { ...i, quantity: Math.max(1, capped) } : i
       )
     );
   };
 
   const clearCart = () => setItems([]);
+
+  const clearShippingDetails = () => {
+    setShippingDetailsState(null);
+    localStorage.removeItem(SHIPPING_STORAGE_KEY);
+  };
 
   const subtotal = useMemo(
     () => items.reduce((sum, i) => {
@@ -109,7 +162,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   return (
     <CartContext.Provider
-      value={{ items, addItem, removeItem, updateQuantity, clearCart, subtotal, deliveryCharge, vat, itemCount, coupon, discount, applyCoupon, removeCoupon }}
+      value={{
+        items, addItem, removeItem, updateQuantity, clearCart, subtotal, deliveryCharge, vat, itemCount,
+        coupon, discount, applyCoupon, removeCoupon, shippingDetails, setShippingDetails, clearShippingDetails,
+      }}
     >
       {children}
     </CartContext.Provider>

@@ -27,6 +27,7 @@ export const createProductSchema = z.object({
   isFeatured: z.boolean().default(false),
   isBestSeller: z.boolean().default(false),
   isNewArrival: z.boolean().default(false),
+  isActive: z.boolean().default(true),
   seoTitle: z.string().optional(),
   seoDescription: z.string().optional(),
   metaKeywords: z.string().optional(),
@@ -53,5 +54,6 @@ export const listProductsQuerySchema = z.object({
   featured: z.coerce.boolean().optional(),
   bestSeller: z.coerce.boolean().optional(),
   newArrival: z.coerce.boolean().optional(),
+  status: z.enum(['active', 'inactive']).optional(), // admin listing only
   sort: z.enum(['featured', 'newest', 'price-low', 'price-high', 'popular', 'rating']).default('featured'),
 });

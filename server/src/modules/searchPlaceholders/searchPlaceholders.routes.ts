@@ -6,6 +6,7 @@ import { validateBody } from '../../middleware/validate.middleware.js';
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import { sendPaginated, sendSuccess } from '../../utils/ApiResponse.js';
 import { ApiError } from '../../utils/ApiError.js';
+import { broadcastContentUpdate } from '../../sockets/index.js';
 
 export const searchPlaceholdersRouter = Router();
 export const searchPlaceholdersAdminRouter = Router();
@@ -76,6 +77,7 @@ searchPlaceholdersAdminRouter.post('/', ...adminGuard, validateBody(createSchema
     sortOrder = (last?.sortOrder ?? -1) + 1;
   }
   const placeholder = await prisma.searchPlaceholder.create({ data: { ...req.body, sortOrder } });
+  broadcastContentUpdate('search-placeholders');
   sendSuccess(res, placeholder, 'Placeholder created', 201);
 }));
 
@@ -85,6 +87,7 @@ searchPlaceholdersAdminRouter.patch('/reorder', ...adminGuard, validateBody(reor
   await prisma.$transaction(
     orderedIds.map((id, index) => prisma.searchPlaceholder.update({ where: { id }, data: { sortOrder: index } }))
   );
+  broadcastContentUpdate('search-placeholders');
   sendSuccess(res, null, 'Order updated');
 }));
 
@@ -92,6 +95,7 @@ searchPlaceholdersAdminRouter.patch('/reorder', ...adminGuard, validateBody(reor
 searchPlaceholdersAdminRouter.patch('/toggle', ...adminGuard, validateBody(toggleSchema), asyncHandler(async (req, res) => {
   const { ids, isActive } = req.body as z.infer<typeof toggleSchema>;
   await prisma.searchPlaceholder.updateMany({ where: { id: { in: ids } }, data: { isActive } });
+  broadcastContentUpdate('search-placeholders');
   sendSuccess(res, null, 'Status updated');
 }));
 
@@ -99,6 +103,7 @@ searchPlaceholdersAdminRouter.patch('/toggle', ...adminGuard, validateBody(toggl
 searchPlaceholdersAdminRouter.delete('/bulk', ...destructiveGuard, validateBody(bulkDeleteSchema), asyncHandler(async (req, res) => {
   const { ids } = req.body as z.infer<typeof bulkDeleteSchema>;
   await prisma.searchPlaceholder.deleteMany({ where: { id: { in: ids } } });
+  broadcastContentUpdate('search-placeholders');
   sendSuccess(res, null, 'Placeholders deleted');
 }));
 
@@ -108,6 +113,7 @@ searchPlaceholdersAdminRouter.put('/:id', ...adminGuard, validateBody(updateSche
   if (!existing) throw ApiError.notFound('Placeholder not found');
 
   const placeholder = await prisma.searchPlaceholder.update({ where: { id: req.params.id }, data: req.body });
+  broadcastContentUpdate('search-placeholders');
   sendSuccess(res, placeholder, 'Placeholder updated');
 }));
 
@@ -117,5 +123,6 @@ searchPlaceholdersAdminRouter.delete('/:id', ...destructiveGuard, asyncHandler(a
   if (!existing) throw ApiError.notFound('Placeholder not found');
 
   await prisma.searchPlaceholder.delete({ where: { id: req.params.id } });
+  broadcastContentUpdate('search-placeholders');
   sendSuccess(res, null, 'Placeholder deleted');
 }));

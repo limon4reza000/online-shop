@@ -10,6 +10,8 @@ export const env = {
   nodeEnv: process.env.NODE_ENV || 'development',
   port: Number(process.env.PORT) || 4000,
   clientUrl: process.env.CLIENT_URL || 'http://localhost:5173',
+  adminUrl: process.env.ADMIN_URL || 'http://localhost:5174',
+  get allowedOrigins() { return [this.clientUrl, this.adminUrl]; },
 
   databaseUrl: required('DATABASE_URL', 'mysql://user:password@localhost:3306/nityaghor'),
 

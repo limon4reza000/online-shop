@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 
 function GoogleIcon() {
@@ -22,22 +21,15 @@ function FacebookIcon() {
 
 export function SocialLoginButtons() {
   const { loginWithProvider } = useAuth();
-  const navigate = useNavigate();
-
-  const handle = (provider: 'google' | 'facebook') => {
-    loginWithProvider(provider);
-    navigate('/dashboard');
-  };
 
   return (
     <div className="grid grid-cols-2 gap-3">
-      <button type="button" onClick={() => handle('google')} className="btn-outline btn-sm justify-center !text-text-primary !border-border hover:!bg-primary-light">
+      <button type="button" onClick={() => loginWithProvider('google')} className="btn-outline btn-sm justify-center !text-text-primary !border-border hover:!bg-primary-light">
         <GoogleIcon /> Google
       </button>
-      <button type="button" onClick={() => handle('facebook')} className="btn-outline btn-sm justify-center !text-text-primary !border-border hover:!bg-primary-light">
+      <button type="button" onClick={() => loginWithProvider('facebook')} className="btn-outline btn-sm justify-center !text-text-primary !border-border hover:!bg-primary-light">
         <FacebookIcon /> Facebook
       </button>
-
     </div>
   );
 }

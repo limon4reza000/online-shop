@@ -7,6 +7,7 @@ export const createCategorySchema = z.object({
   icon: z.string().optional(),
   image: z.string().optional(),
   banner: z.string().optional(),
+  bannerImages: z.array(z.string()).max(3, 'সর্বোচ্চ ৩টি ছবি দেওয়া যাবে').optional(),
   isActive: z.boolean().default(true),
   sortOrder: z.number().int().optional(),
 });

@@ -11,6 +11,7 @@ import {
   toggleCategoriesSchema,
 } from './categories.schema.js';
 import * as categoriesService from './categories.service.js';
+import { broadcastContentUpdate } from '../../sockets/index.js';
 
 export const categoriesRouter = Router();
 export const categoriesAdminRouter = Router();
@@ -34,7 +35,7 @@ const destructiveGuard = [protect, authorize('ADMIN')];
 categoriesAdminRouter.get('/', ...adminGuard, asyncHandler(async (_req, res) => {
   const categories = await prisma.category.findMany({
     orderBy: [{ parentId: 'asc' }, { sortOrder: 'asc' }],
-    include: { parent: { select: { id: true, name: true } }, _count: { select: { children: true, products: true } } },
+    include: { parent: { select: { id: true, name: true, slug: true } }, _count: { select: { children: true, products: true } } },
   });
   sendSuccess(res, categories);
 }));
@@ -47,6 +48,7 @@ categoriesAdminRouter.get('/tree', ...adminGuard, asyncHandler(async (_req, res)
 
 categoriesAdminRouter.post('/', ...adminGuard, validateBody(createCategorySchema), asyncHandler(async (req, res) => {
   const category = await categoriesService.createCategory(req.body);
+  broadcastContentUpdate('categories');
   sendSuccess(res, category, 'Category created', 201);
 }));
 
@@ -56,21 +58,25 @@ categoriesAdminRouter.patch('/reorder', ...adminGuard, validateBody(reorderCateg
   await prisma.$transaction(
     orderedIds.map((id, index) => prisma.category.update({ where: { id }, data: { sortOrder: index } }))
   );
+  broadcastContentUpdate('categories');
   sendSuccess(res, null, 'Order updated');
 }));
 
 categoriesAdminRouter.patch('/toggle', ...adminGuard, validateBody(toggleCategoriesSchema), asyncHandler(async (req, res) => {
   const { ids, isActive } = req.body as { ids: string[]; isActive: boolean };
   await prisma.category.updateMany({ where: { id: { in: ids } }, data: { isActive } });
+  broadcastContentUpdate('categories');
   sendSuccess(res, null, 'Status updated');
 }));
 
 categoriesAdminRouter.patch('/:id', ...adminGuard, validateBody(updateCategorySchema), asyncHandler(async (req, res) => {
   const category = await categoriesService.updateCategory(req.params.id, req.body);
+  broadcastContentUpdate('categories');
   sendSuccess(res, category, 'Category updated');
 }));
 
 categoriesAdminRouter.delete('/:id', ...destructiveGuard, asyncHandler(async (req, res) => {
   await categoriesService.deleteCategory(req.params.id);
+  broadcastContentUpdate('categories');
   sendSuccess(res, null, 'Category deleted');
 }));

@@ -7,10 +7,10 @@ import { SkeletonCard } from '@/components/ui/SkeletonCard';
 import { Pagination } from '@/components/ui/Pagination';
 import { QuickViewModal } from '@/components/ui/QuickViewModal';
 import { Seo } from '@/components/ui/Seo';
-import { categories as allCategories, brands } from '@/lib/data';
-
-const categories = allCategories.filter((c) => c.parentSlug);
+import { useCategoryTree } from '@/hooks/useCategories';
 import { useProducts } from '@/hooks/useProducts';
+import { useBrands } from '@/hooks/useBrands';
+import { usePublicStoreSettings } from '@/hooks/useSettings';
 import { formatPrice } from '@/lib/format';
 import type { Product } from '@/lib/types';
 
@@ -20,6 +20,10 @@ const MAX_PRICE = 400;
 export default function Shop() {
   const [searchParams] = useSearchParams();
   const initialQuery = searchParams.get('q') || '';
+  const { data: storeSettings } = usePublicStoreSettings();
+  const shopSubtitles = [storeSettings?.shopSubtitle1, storeSettings?.shopSubtitle2, storeSettings?.shopSubtitle3].filter(
+    (s): s is string => !!s
+  );
   const initialSort = searchParams.get('sort') || 'featured';
 
   const [query, setQuery] = useState(initialQuery);
@@ -33,6 +37,10 @@ export default function Shop() {
   const [quickView, setQuickView] = useState<Product | null>(null);
 
   const { data: products = [], isLoading: loading } = useProducts();
+  const { categories: allCategories } = useCategoryTree();
+  const categories = useMemo(() => allCategories.filter((c) => c.parentSlug), [allCategories]);
+  const { data: brandList = [] } = useBrands();
+  const brands = useMemo(() => brandList.map((b) => b.name), [brandList]);
 
   const toggle = (list: string[], setList: (v: string[]) => void, value: string) => {
     setList(list.includes(value) ? list.filter((v) => v !== value) : [...list, value]);
@@ -119,9 +127,14 @@ export default function Shop() {
   return (
     <>
       <Seo title="Shop All" description="আমাদের প্রিমিয়াম ফ্যাশন ও লাইফস্টাইল পণ্যের সম্পূর্ণ সংগ্রহ দেখুন।" />
-      <PageHeader title="সব পণ্য" subtitle="আমাদের প্রিমিয়াম ফ্যাশন ও লাইফস্টাইল পণ্যের সম্পূর্ণ সংগ্রহ দেখুন।" crumbs={[{ label: 'শপ' }]} />
+      <PageHeader
+        title="সব পণ্য"
+        subtitle={shopSubtitles.length > 0 ? shopSubtitles : 'আমাদের প্রিমিয়াম ফ্যাশন ও লাইফস্টাইল পণ্যের সম্পূর্ণ সংগ্রহ দেখুন।'}
+        crumbs={[{ label: 'শপ' }]}
+        centerBack
+      />
 
-      <div className="container-app section-y !py-10 sm:!py-12">
+      <div className="container-app section-y py-6! sm:py-10!">
         <div className="grid lg:grid-cols-[260px_1fr] gap-8">
           <aside className="hidden lg:block">
             <div className="card-surface p-6 sticky top-28">{FilterPanel}</div>
@@ -146,11 +159,11 @@ export default function Shop() {
             </div>
 
             {loading ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 border-t border-l border-border">
                 {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}
               </div>
             ) : pageItems.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 border-t border-l border-border">
                 {pageItems.map((p) => <ProductCard key={p.id} product={p} onQuickView={setQuickView} />)}
               </div>
             ) : (

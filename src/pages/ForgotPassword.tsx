@@ -3,19 +3,27 @@ import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Mail, ArrowLeft, MailCheck } from 'lucide-react';
+import { Mail, ArrowLeft, MailCheck, Loader2 } from 'lucide-react';
+import { api } from '@/lib/api';
+import { useToast } from '@/context/ToastContext';
 
 const schema = z.object({ email: z.string().email('সঠিক ইমেইল ঠিকানা লিখুন') });
 type FormData = z.infer<typeof schema>;
 
 export default function ForgotPassword() {
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({ resolver: zodResolver(schema) });
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({ resolver: zodResolver(schema) });
   const [sent, setSent] = useState(false);
   const [email, setEmail] = useState('');
+  const { showToast } = useToast();
 
-  const onSubmit = (data: FormData) => {
-    setEmail(data.email);
-    setSent(true);
+  const onSubmit = async (data: FormData) => {
+    try {
+      await api.post('/auth/forgot-password', { email: data.email });
+      setEmail(data.email);
+      setSent(true);
+    } catch {
+      showToast('অনুরোধ পাঠানো যায়নি, আবার চেষ্টা করুন', 'error');
+    }
   };
 
   return (
@@ -34,7 +42,9 @@ export default function ForgotPassword() {
                 </div>
                 {errors.email && <span className="text-xs text-error mt-1 block">{errors.email.message}</span>}
               </label>
-              <button type="submit" className="btn-primary w-full">রিসেট লিংক পাঠান</button>
+              <button type="submit" disabled={isSubmitting} className="btn-primary w-full disabled:opacity-60">
+                {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : 'রিসেট লিংক পাঠান'}
+              </button>
             </form>
           </>
         ) : (

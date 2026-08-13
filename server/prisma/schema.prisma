@@ -37,6 +37,28 @@ enum ReviewStatus {
   REJECTED
 }
 
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum ConversationStatus {
+  OPEN
+  RESOLVED
+}
+
+enum MessageSenderRole {
+  CUSTOMER
+  ADMIN
+}
+
+enum MessageStatus {
+  SENT
+  DELIVERED
+  SEEN
+}
+
 model User {
   id              String    @id @default(cuid())
   name            String
@@ -45,6 +67,8 @@ model User {
   role            Role      @default(CUSTOMER)
   avatarUrl       String?
   phone           String?
+  dateOfBirth     DateTime?
+  gender          Gender?
   googleId        String?   @unique
   facebookId      String?   @unique
   emailVerified   Boolean   @default(false)
@@ -62,6 +86,37 @@ model User {
   wishlist        WishlistItem[]
   notifications   Notification[]
   cartItems       CartItem[]
+  recentlyViewed  RecentlyViewed[]
+  conversation    Conversation?
+}
+
+// One support conversation per customer — admins reply into it, live via socket.io.
+model Conversation {
+  id            String             @id @default(cuid())
+  userId        String             @unique
+  user          User               @relation(fields: [userId], references: [id])
+  status        ConversationStatus @default(OPEN)
+  lastMessageAt DateTime           @default(now())
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  messages      Message[]
+
+  @@index([status, lastMessageAt])
+}
+
+model Message {
+  id             String            @id @default(cuid())
+  conversationId String
+  conversation   Conversation      @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderRole     MessageSenderRole
+  senderId       String
+  content        String            @db.Text
+  attachmentUrl  String?
+  status         MessageStatus     @default(SENT)
+  createdAt      DateTime          @default(now())
+
+  @@index([conversationId, createdAt])
 }
 
 model Category {
@@ -70,7 +125,8 @@ model Category {
   slug      String     @unique
   icon      String? // emoji or icon key, shown for main categories
   image     String? // subcategory thumbnail
-  banner    String? // main category page hero banner
+  banner    String? // main category page hero banner (legacy, single image)
+  bannerImages Json? // subcategory hero carousel — array of image URLs (up to 3)
   isActive  Boolean    @default(true)
   sortOrder Int        @default(0)
   createdAt DateTime   @default(now())
@@ -86,12 +142,19 @@ model Category {
 }
 
 model Brand {
-  id        String    @id @default(cuid())
-  name      String    @unique
-  logoUrl   String?
-  createdAt DateTime  @default(now())
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?   @db.Text
+  logoUrl     String?
+  banner      String?
+  featured    Boolean   @default(false)
+  isActive    Boolean   @default(true)
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now()) @updatedAt
 
-  products  Product[]
+  products    Product[]
 }
 
 model Product {
@@ -140,6 +203,7 @@ model Product {
   wishlistedBy     WishlistItem[]
   orderItems       OrderItem[]
   cartItems        CartItem[]
+  viewedBy         RecentlyViewed[]
 
   @@index([categoryId])
   @@index([brandId])
@@ -166,19 +230,23 @@ model Review {
 }
 
 model Address {
-  id         String   @id @default(cuid())
-  label      String   @default("Home")
-  fullName   String
-  line1      String
-  city       String
-  zip        String
-  country    String
-  phone      String
-  isDefault  Boolean  @default(false)
-  createdAt  DateTime @default(now())
+  id          String   @id @default(cuid())
+  label       String   @default("Home") // Home | Office | Other
+  fullName    String
+  phone       String
+  division    String
+  district    String
+  upazila     String
+  postalCode  String
+  fullAddress String
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  userId     String
-  user       User     @relation(fields: [userId], references: [id])
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
 }
 
 model CartItem {
@@ -206,6 +274,19 @@ model WishlistItem {
   product    Product  @relation(fields: [productId], references: [id])
 
   @@unique([userId, productId])
+}
+
+model RecentlyViewed {
+  id         String   @id @default(cuid())
+  viewedAt   DateTime @default(now())
+
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id])
+
+  @@unique([userId, productId])
+  @@index([userId, viewedAt])
 }
 
 model Order {
@@ -272,6 +353,53 @@ model SearchPlaceholder {
   sortOrder Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// Singleton row (fixed id) holding storefront-wide toggles admin can edit.
+model StoreSettings {
+  id                     String   @id @default("store")
+  freeDeliveryEnabled    Boolean  @default(false)
+  freeDeliveryThreshold  Int      @default(3000)
+
+  // Product page trust badges (ফ্রি শিপিং / রিটার্ন / নিরাপদ পেমেন্ট).
+  shippingBadgeTitle     String   @default("ফ্রি শিপিং")
+  shippingBadgeDesc      String   @default("৭৫ ডলারের বেশি অর্ডারে")
+  returnBadgeTitle       String   @default("৩০ দিনের রিটার্ন")
+  returnBadgeDesc        String   @default("ঝামেলামুক্ত")
+  paymentBadgeTitle      String   @default("নিরাপদ পেমেন্ট")
+  paymentBadgeDesc       String   @default("১০০% সুরক্ষিত")
+
+  // Shop page header — 3 rotating tagline sentences (typewriter effect).
+  shopSubtitle1          String   @default("আমাদের প্রিমিয়াম ফ্যাশন সংগ্রহ দেখুন।")
+  shopSubtitle2          String   @default("সেরা দামে সেরা পণ্য, এখনই কিনুন।")
+  shopSubtitle3          String   @default("প্রতিদিন নতুন কালেকশন যোগ হচ্ছে।")
+
+  // Home page flash-sale countdown — admin can disable, set, or extend the deadline.
+  flashSaleEnabled       Boolean   @default(true)
+  flashSaleEndsAt        DateTime?
+
+  // Footer — admin-managed social/contact links.
+  facebookUrl            String?
+  instagramUrl           String?
+  whatsappNumber         String?
+  messengerUrl           String?
+
+  updatedAt              DateTime @updatedAt
+}
+
+// Singleton row — the floating promotional popup shown on the home page.
+model PromoPopup {
+  id            String    @id @default("promo-popup")
+  enabled       Boolean   @default(false)
+  title         String    @default("অফার শীঘ্রই শেষ হচ্ছে")
+  message       String    @default("সীমিত সময়ের জন্য বিশেষ ছাড় — এখনই কেনাকাটা করুন।")
+  imageUrl      String?
+  buttonText    String?
+  buttonLink    String?
+  delaySeconds  Int       @default(3)
+  startAt       DateTime?
+  endAt         DateTime?
+  updatedAt     DateTime  @updatedAt
 }
 
 model Notification {

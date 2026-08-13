@@ -3,8 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { User, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { User, Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/context/ToastContext';
 import { Seo } from '@/components/ui/Seo';
 import { SocialLoginButtons } from '@/components/ui/SocialLoginButtons';
 
@@ -21,14 +22,20 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export default function Register() {
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({ resolver: zodResolver(schema) });
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({ resolver: zodResolver(schema) });
   const [showPw, setShowPw] = useState(false);
   const { register: doRegister } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
 
-  const onSubmit = (data: FormData) => {
-    doRegister(data.name, data.email);
-    navigate('/verify-email');
+  const onSubmit = async (data: FormData) => {
+    try {
+      await doRegister(data.name, data.email, data.password);
+      navigate('/verify-email');
+    } catch (err) {
+      const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      showToast(message || 'অ্যাকাউন্ট তৈরি করা যায়নি, আবার চেষ্টা করুন', 'error');
+    }
   };
 
   return (
@@ -86,7 +93,9 @@ export default function Register() {
           </label>
           {errors.agree && <span className="text-xs text-error block -mt-3">{errors.agree.message}</span>}
 
-          <button type="submit" className="btn-primary w-full">অ্যাকাউন্ট তৈরি করুন</button>
+          <button type="submit" disabled={isSubmitting} className="btn-primary w-full disabled:opacity-60">
+            {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : 'অ্যাকাউন্ট তৈরি করুন'}
+          </button>
         </form>
 
         <div className="flex items-center gap-3 my-6">

@@ -13,7 +13,7 @@ const values = [
 export default function About() {
   return (
     <>
-      <PageHeader title="আমাদের গল্প" subtitle="২০১৬ সাল থেকে চিরকালীন স্টাইল তৈরি করে আসছি।" crumbs={[{ label: 'আমাদের সম্পর্কে' }]} />
+      <PageHeader title="আমাদের গল্প" crumbs={[{ label: 'আমাদের সম্পর্কে' }]} showBack />
 
       <div className="container-app section-y grid lg:grid-cols-2 gap-10 items-center">
         <FadeIn>
@@ -34,19 +34,19 @@ export default function About() {
         </FadeIn>
       </div>
 
-      <div className="section-y bg-white border-y border-border">
+      <div className="pt-14 sm:pt-20 pb-8 sm:pb-10 bg-white">
         <div className="container-app">
           <FadeIn className="text-center max-w-xl mx-auto mb-10">
             <span className="eyebrow justify-center">আমাদের মূল্যবোধ</span>
             <h2 className="mt-3 text-3xl sm:text-4xl">যা আমাদের এগিয়ে নিয়ে যায়</h2>
           </FadeIn>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid grid-cols-4 gap-3 sm:gap-5">
             {values.map((v, i) => (
               <FadeIn key={v.title} delay={i * 80}>
-                <div className="card-surface p-6 text-center h-full hover:shadow-lift hover:-translate-y-1">
-                  <span className="grid place-items-center h-12 w-12 rounded-2xl bg-primary-light text-primary mx-auto"><v.icon size={22} /></span>
-                  <h4 className="mt-4 font-bold">{v.title}</h4>
-                  <p className="mt-2 text-sm text-text-secondary">{v.desc}</p>
+                <div className="card-surface p-3 sm:p-6 text-center h-full hover:shadow-lift hover:-translate-y-1">
+                  <span className="grid place-items-center h-9 w-9 sm:h-12 sm:w-12 rounded-xl sm:rounded-2xl bg-primary-light text-primary mx-auto"><v.icon size={18} /></span>
+                  <h4 className="mt-2 sm:mt-4 text-xs sm:text-base font-bold">{v.title}</h4>
+                  <p className="mt-2 hidden sm:block text-sm text-text-secondary">{v.desc}</p>
                 </div>
               </FadeIn>
             ))}
@@ -54,12 +54,12 @@ export default function About() {
         </div>
       </div>
 
-      <div className="container-app section-y">
-        <div className="grid sm:grid-cols-4 gap-6 text-center">
+      <div className="container-app pt-8 sm:pt-10 pb-8 sm:pb-10">
+        <div className="grid grid-cols-4 gap-3 sm:gap-6 text-center">
           {[['১৫০K+', 'সন্তুষ্ট গ্রাহক'], ['৪০+', 'দেশে সেবা প্রদান'], ['৫০০+', 'নির্বাচিত পণ্য'], ['৯', 'বছরের কারুকার্য']].map(([num, label]) => (
             <FadeIn key={label}>
-              <p className="text-4xl font-bold text-primary font-display">{num}</p>
-              <p className="text-sm text-text-secondary mt-1">{label}</p>
+              <p className="text-xl sm:text-4xl font-bold text-primary font-display">{num}</p>
+              <p className="text-[11px] sm:text-sm text-text-secondary mt-1">{label}</p>
             </FadeIn>
           ))}
         </div>

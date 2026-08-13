@@ -1,21 +1,21 @@
 import { Link } from 'react-router-dom';
-import { Heart, ShoppingBag, X } from 'lucide-react';
+import { Heart, X } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Rating } from '@/components/ui/Rating';
+import { AddToCartControl } from '@/components/ui/AddToCartControl';
 import { useWishlist } from '@/context/WishlistContext';
-import { useCart } from '@/context/CartContext';
-import { products } from '@/lib/data';
+import { useProducts } from '@/hooks/useProducts';
 import { formatPrice } from '@/lib/format';
 
 export default function Wishlist() {
   const { ids, toggle } = useWishlist();
-  const { addItem } = useCart();
+  const { data: products = [] } = useProducts();
   const items = products.filter((p) => ids.includes(p.id));
 
   return (
     <>
-      <PageHeader title="আমার পছন্দের তালিকা" subtitle="আপনার পরে কেনার জন্য সংরক্ষিত পণ্যসমূহ।" crumbs={[{ label: 'পছন্দের তালিকা' }]} />
+      <PageHeader title="আমার পছন্দের তালিকা" crumbs={[{ label: 'পছন্দের তালিকা' }]} showBack />
       <div className="container-app section-y">
         {items.length === 0 ? (
           <EmptyState
@@ -42,9 +42,7 @@ export default function Wishlist() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <button onClick={() => addItem({ productId: p.id, quantity: 1 })} className="btn-primary btn-sm">
-                    <ShoppingBag size={14} /> কার্টে যোগ করুন
-                  </button>
+                  <AddToCartControl productId={p.id} stock={p.stock} size="sm" className="w-36" />
                   <button onClick={() => toggle(p.id)} aria-label="মুছে ফেলুন" className="grid place-items-center h-10 w-10 rounded-full border border-border hover:border-error hover:text-error transition-colors">
                     <X size={16} />
                   </button>

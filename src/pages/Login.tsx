@@ -3,8 +3,9 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Mail, Lock, Eye, EyeOff, ShieldCheck } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/context/ToastContext';
 import { Seo } from '@/components/ui/Seo';
 import { SocialLoginButtons } from '@/components/ui/SocialLoginButtons';
 
@@ -15,16 +16,21 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export default function Login() {
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({ resolver: zodResolver(schema) });
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({ resolver: zodResolver(schema) });
   const [showPw, setShowPw] = useState(false);
-  const { login, loginAsAdmin } = useAuth();
+  const { login } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
   const from = (location.state as { from?: string } | null)?.from;
 
-  const onSubmit = (data: FormData) => {
-    login(data.email);
-    navigate(from || '/dashboard');
+  const onSubmit = async (data: FormData) => {
+    try {
+      await login(data.email, data.password);
+      navigate(from || '/dashboard');
+    } catch {
+      showToast('ভুল ইমেইল অথবা পাসওয়ার্ড', 'error');
+    }
   };
 
   return (
@@ -61,7 +67,9 @@ export default function Login() {
             {errors.password && <span className="text-xs text-error mt-1 block">{errors.password.message}</span>}
           </label>
 
-          <button type="submit" className="btn-primary w-full">সাইন ইন</button>
+          <button type="submit" disabled={isSubmitting} className="btn-primary w-full disabled:opacity-60">
+            {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : 'সাইন ইন'}
+          </button>
         </form>
 
         <div className="flex items-center gap-3 my-6">
@@ -71,13 +79,6 @@ export default function Login() {
         </div>
 
         <SocialLoginButtons />
-
-        <button
-          onClick={() => { loginAsAdmin(); navigate('/admin'); }}
-          className="flex items-center justify-center gap-2 w-full mt-4 text-xs font-semibold text-text-secondary hover:text-primary transition-colors"
-        >
-          <ShieldCheck size={14} /> অ্যাডমিন হিসেবে চালিয়ে যান (ডেমো)
-        </button>
 
         <p className="text-center text-sm text-text-secondary mt-7">
           অ্যাকাউন্ট নেই? <Link to="/register" className="text-primary font-semibold hover:underline">সাইন আপ করুন</Link>

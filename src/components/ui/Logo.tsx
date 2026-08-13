@@ -28,7 +28,7 @@ export function Logo({
         </span>
         {tagline && (
           <span className={`text-[11px] font-medium ${onDark ? 'text-white/75' : 'text-text-secondary'}`}>
-            {t('সহজে কেনাকাটা করুন')}
+            {t('header.tagline')}
           </span>
         )}
       </span>

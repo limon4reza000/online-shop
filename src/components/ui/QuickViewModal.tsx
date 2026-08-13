@@ -14,12 +14,20 @@ export function QuickViewModal({ product, onClose }: { product: Product | null; 
   const [color, setColor] = useState(product?.colors?.[0]?.name);
   const [size, setSize] = useState(product?.sizes?.[2]);
 
+  const discount = product?.oldPrice && product.oldPrice > product.price
+    ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
+    : 0;
+  const inStock = (product?.stock ?? 0) > 0;
+
   return (
     <Modal open={!!product} onClose={onClose} maxWidth="max-w-3xl">
       {product && (
         <div className="grid sm:grid-cols-2 gap-6 sm:gap-8">
-          <div className="rounded-2xl overflow-hidden bg-primary-light aspect-square">
+          <div className="relative rounded-2xl overflow-hidden bg-primary-light aspect-square">
             <img src={product.images[0]} alt={product.name} className="h-full w-full object-cover" />
+            {discount > 0 && (
+              <span className="absolute top-3 left-3 rounded-full bg-primary text-white text-xs font-bold px-2.5 py-1">-{discount}%</span>
+            )}
           </div>
           <div>
             <p className="text-xs uppercase tracking-wide text-text-secondary font-semibold">{product.brand}</p>
@@ -28,6 +36,10 @@ export function QuickViewModal({ product, onClose }: { product: Product | null; 
             <div className="mt-3 flex items-center gap-2">
               <span className="text-2xl font-bold">{formatPrice(product.price)}</span>
               {product.oldPrice && <span className="text-text-secondary line-through">{formatPrice(product.oldPrice)}</span>}
+            </div>
+            <div className="mt-1.5 flex items-center gap-1.5 text-xs font-semibold">
+              <span className={`h-1.5 w-1.5 rounded-full ${inStock ? 'bg-success' : 'bg-error'}`} />
+              <span className={inStock ? 'text-success' : 'text-error'}>{inStock ? 'স্টকে আছে' : 'স্টক নেই'}</span>
             </div>
             <p className="mt-3 text-sm text-text-secondary line-clamp-3">{product.description}</p>
 
@@ -68,6 +80,7 @@ export function QuickViewModal({ product, onClose }: { product: Product | null; 
 
             <div className="mt-6 flex gap-3">
               <button
+                disabled={!inStock}
                 onClick={() => { addItem({ productId: product.id, quantity: 1, color, size }); onClose(); }}
                 className="btn-primary flex-1"
               >

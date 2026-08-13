@@ -22,9 +22,11 @@ function discountPercent(price: number, oldPrice?: number | null) {
   return Math.round(((oldPrice - price) / oldPrice) * 100);
 }
 
-export async function listProducts(query: ListQuery) {
+export async function listProducts(query: ListQuery, opts: { isAdmin?: boolean } = {}) {
   const where: Prisma.ProductWhereInput = {
-    isActive: true,
+    ...(opts.isAdmin
+      ? query.status && { isActive: query.status === 'active' }
+      : { isActive: true }),
     ...(query.q && {
       OR: [
         { name: { contains: query.q } },
@@ -38,7 +40,7 @@ export async function listProducts(query: ListQuery) {
     ...(query.subCategory
       ? { category: { slug: query.subCategory } }
       : query.category && { category: { OR: [{ slug: query.category }, { parent: { slug: query.category } }] } }),
-    ...(query.brand && { brand: { name: query.brand } }),
+    ...(query.brand && { brand: { slug: query.brand } }),
     ...(query.color && { colors: { array_contains: query.color } }),
     ...(query.size && { sizes: { array_contains: query.size } }),
     ...(query.minRating && { rating: { gte: query.minRating } }),
@@ -126,9 +128,43 @@ export async function deleteProduct(id: string) {
   await prisma.product.delete({ where: { id } });
 }
 
-export async function getRelatedProducts(productId: string, categoryId: string, limit = 4) {
-  return prisma.product.findMany({
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/**
+ * Same subcategory first; if that's not enough, top up with siblings from the
+ * same main category (excluding the subcategory already covered, so nothing
+ * repeats), then shuffle so the "recommended" rail isn't identical every visit.
+ */
+export async function getRelatedProducts(productId: string, categoryId: string, limit = 12) {
+  const category = await prisma.category.findUnique({ where: { id: categoryId } });
+  if (!category) return [];
+
+  const sameSubCategory = await prisma.product.findMany({
     where: { categoryId, id: { not: productId }, isActive: true },
-    take: limit,
+    include: { category: true, brand: true },
   });
+
+  let pool = sameSubCategory;
+  if (pool.length < limit) {
+    const mainCategoryId = category.parentId ?? category.id;
+    const fromMainCategory = await prisma.product.findMany({
+      where: {
+        id: { not: productId, notIn: pool.map((p) => p.id) },
+        isActive: true,
+        category: { OR: [{ id: mainCategoryId }, { parentId: mainCategoryId }] },
+      },
+      include: { category: true, brand: true },
+      take: (limit - pool.length) * 2, // extra headroom so shuffling still has variety
+    });
+    pool = [...pool, ...fromMainCategory];
+  }
+
+  return shuffle(pool).slice(0, limit);
 }

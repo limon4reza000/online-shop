@@ -28,7 +28,7 @@ export default function OrderTracking() {
 
   return (
     <>
-      <PageHeader title="আপনার অর্ডার ট্র্যাক করুন" subtitle="রিয়েল-টাইম স্ট্যাটাস দেখতে আপনার অর্ডার আইডি দিন।" crumbs={[{ label: 'অর্ডার ট্র্যাকিং' }]} />
+      <PageHeader title="আপনার অর্ডার ট্র্যাক করুন" crumbs={[{ label: 'অর্ডার ট্র্যাকিং' }]} showBack />
       <div className="container-app section-y">
         <form onSubmit={track} className="max-w-lg mx-auto flex gap-3 mb-12">
           <div className="relative flex-1">

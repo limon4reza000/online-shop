@@ -2,11 +2,13 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { MailCheck, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { Seo } from '@/components/ui/Seo';
+import { PageLoader } from '@/components/ui/PageLoader';
 
 export default function EmailVerification() {
-  const { user, resendOtp } = useAuth();
+  const { user, isLoading, resendOtp } = useAuth();
   const navigate = useNavigate();
 
+  if (isLoading) return <PageLoader />;
   if (!user) return <Navigate to="/register" replace />;
   if (user.emailVerified) return <Navigate to="/dashboard" replace />;
 

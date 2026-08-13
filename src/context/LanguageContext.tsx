@@ -1,33 +1,33 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-import { translate } from '@/lib/i18n';
+import { createContext, useContext, useEffect, useMemo, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
+import { STORAGE_KEY } from '@/i18n';
 
 type Language = 'bn' | 'en';
 interface LanguageContextValue {
   language: Language;
   toggleLanguage: () => void;
-  t: (text: string) => string;
+  /** Looks up a translation key (e.g. `t('common.viewAll')`) in the active locale's
+   * resource file, with an optional interpolation map (`t('key', { name: value })`).
+   * Never pass raw Bangla/English text here — add it to `src/i18n/locales/*.json` instead. */
+  t: (key: string, options?: Record<string, string | number>) => string;
 }
 
 const LanguageContext = createContext<LanguageContextValue | null>(null);
-const STORAGE_KEY = 'shop-language-v1';
-
-function getInitialLanguage(): Language {
-  const stored = localStorage.getItem(STORAGE_KEY);
-  return stored === 'en' ? 'en' : 'bn';
-}
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguage] = useState<Language>(getInitialLanguage);
+  const { t, i18n } = useTranslation();
+  const language = (i18n.resolvedLanguage as Language) || 'bn';
 
   useEffect(() => {
     document.documentElement.lang = language;
     localStorage.setItem(STORAGE_KEY, language);
   }, [language]);
 
-  const toggleLanguage = () => setLanguage((l) => (l === 'bn' ? 'en' : 'bn'));
-  const t = (text: string) => translate(text, language);
+  const toggleLanguage = () => i18n.changeLanguage(language === 'bn' ? 'en' : 'bn');
 
-  return <LanguageContext.Provider value={{ language, toggleLanguage, t }}>{children}</LanguageContext.Provider>;
+  const value = useMemo(() => ({ language, toggleLanguage, t }), [language, t]);
+
+  return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
 }
 
 export function useLanguage() {

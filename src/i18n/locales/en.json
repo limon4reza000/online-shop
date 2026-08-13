@@ -1,0 +1,111 @@
+{
+  "common": {
+    "outOfStock": "Out of Stock",
+    "viewAll": "View All",
+    "addToCart": "Add to Cart",
+    "quickView": "Quick View",
+    "toggleWishlist": "Toggle wishlist",
+    "new": "New",
+    "decreaseQty": "Decrease quantity",
+    "increaseQty": "Increase quantity",
+    "views": "views"
+  },
+  "nav": {
+    "home": "Home",
+    "shop": "Shop",
+    "categories": "Categories",
+    "aboutUs": "About Us",
+    "contact": "Contact",
+    "cart": "Cart",
+    "notifications": "Notifications",
+    "chat": "Chat",
+    "profile": "Profile",
+    "login": "Login",
+    "myOrders": "My Orders",
+    "wishlist": "Wishlist",
+    "more": "More"
+  },
+  "header": {
+    "openMenu": "Open menu",
+    "searchPlaceholder": "Search products...",
+    "tagline": "Shop with ease",
+    "lightMode": "Light mode",
+    "darkMode": "Dark mode",
+    "adminPanel": "Admin panel",
+    "dashboard": "Dashboard",
+    "signOut": "Sign out",
+    "register": "Register"
+  },
+  "sidebar": {
+    "shopSection": "Shop",
+    "accountSection": "My Account",
+    "community": "Community",
+    "light": "Light",
+    "dark": "Dark"
+  },
+  "search": {
+    "prefix": "Search নিত্যঘর "
+  },
+  "promoPills": {
+    "newCollectionDaily": "New Collection Daily",
+    "secureCheckout": "100% Secure Checkout",
+    "cashOnDelivery": "Cash on Delivery Available",
+    "installApp": "Install App",
+    "freeShippingOver": "৳{{amount}}+ Free Shipping",
+    "freeDeliveryOver": "Free Delivery on ৳{{amount}}+ Orders"
+  },
+  "hero": {
+    "shopNow": "Shop Now",
+    "fastLabel": "Fast",
+    "deliveryLabel": "Delivery",
+    "slides": {
+      "0": {
+        "eyebrow": "New Season Collection",
+        "titleSmall": "Best Style",
+        "titleAccent": "Best Mood",
+        "description": "Discover premium fashion, curated capsule collections, and timeless essentials — styled to make every day special."
+      },
+      "1": {
+        "eyebrow": "Curated Collection",
+        "titleSmall": "Timeless Touch",
+        "titleAccent": "Modern Edge",
+        "description": "An elegant collection of wardrobe staples built to last — thoughtfully sourced, effortlessly versatile."
+      },
+      "2": {
+        "eyebrow": "Members Only",
+        "titleSmall": "Join & Get",
+        "titleAccent": "10% Off",
+        "description": "Create a free account and enjoy early access, exclusive pricing, and faster checkout."
+      }
+    },
+    "features": {
+      "trustedQuality": "Trusted Quality",
+      "bestTaste": "Best Taste",
+      "premiumQuality": "Premium Quality",
+      "madeWithLove": "Made with Love"
+    }
+  },
+  "todaysPicks": {
+    "title": "Today's Edits",
+    "eyebrow": "Today's Picks",
+    "subtitle": "Hand-picked by our team, today's best finds"
+  },
+  "home": {
+    "yoursPicks": { "title": "Your's Picks", "eyebrow": "Customers' Choice", "subtitle": "Our community's repeat favorites" },
+    "dealsOfTheDay": { "title": "Deals of the Day", "eyebrow": "Limited Time Offer", "subtitle": "Best picks at today's special discount" },
+    "shopUnder99": { "title": "Shop Under ৳99", "eyebrow": "Under ৳{{amount}}", "subtitle": "Great picks at friendly prices" },
+    "newArrivals": { "title": "New Products", "eyebrow": "New Arrivals", "subtitle": "Fresh styles, just landed" },
+    "categoryRail": { "eyebrow": "Category", "subtitle": "Best picks from {{category}}" }
+  },
+  "featuredBrands": {
+    "eyebrow": "Brands We Trust",
+    "title": "Featured Brands",
+    "viewAll": "View All Brands"
+  },
+  "footer": {
+    "sectionLabel": "The Last Word",
+    "headlineLead": "See you ",
+    "headlineHighlight": "tomorrow,",
+    "headlineTail": "same shelf."
+  }
+}

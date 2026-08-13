@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="bn">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>নিত্যঘর অ্যাডমিন প্যানেল</title>
+    <meta name="description" content="নিত্যঘর ই-কমার্স সাইটের অ্যাডমিন ও ম্যানেজমেন্ট প্যানেল।" />
+    <meta name="robots" content="noindex, nofollow" />
+    <script>
+      (function () {
+        var stored = localStorage.getItem('shop-theme-v1');
+        var isDark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (isDark) document.documentElement.classList.add('dark');
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

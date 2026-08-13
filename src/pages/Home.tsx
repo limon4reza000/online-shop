@@ -1,56 +1,116 @@
 import { useMemo, useState } from 'react';
+import { Heart, Tag, Sparkles, Zap } from 'lucide-react';
 import { Hero } from '@/components/sections/Hero';
 import { PromoPills } from '@/components/sections/PromoPills';
 import { ProductRail } from '@/components/sections/ProductRail';
 import { TodaysPicks } from '@/components/sections/TodaysPicks';
-import { FlashSale } from '@/components/sections/FlashSale';
-import { ReelsSection } from '@/components/sections/ReelsSection';
+import { OfferPopup } from '@/components/sections/OfferPopup';
 import { RecentlyViewedHome } from '@/components/sections/RecentlyViewedHome';
 import { FeaturedBrands } from '@/components/sections/FeaturedBrands';
-import { CustomerReviews } from '@/components/sections/CustomerReviews';
-import { Newsletter } from '@/components/sections/Newsletter';
-import { InstagramGallery } from '@/components/sections/InstagramGallery';
 import { QuickViewModal } from '@/components/ui/QuickViewModal';
-import { products, getSubCategories } from '@/lib/data';
+import { CategoryIcon } from '@/components/ui/CategoryIcon';
+import { useProducts } from '@/hooks/useProducts';
+import { useCategoryTree } from '@/hooks/useCategories';
+import { useLanguage } from '@/context/LanguageContext';
 import type { Product } from '@/lib/types';
 
-const BUDGET_CEILING = 60;
+const BUDGET_CEILING = 99;
 
 export default function Home() {
   const [quickView, setQuickView] = useState<Product | null>(null);
+  const { data: products = [] } = useProducts();
+  const { mainCategories, getSubCategories } = useCategoryTree();
+  const { t } = useLanguage();
 
-  const todaysPicks = useMemo(() => products.filter((p) => p.tags.includes('bestseller')).slice(0, 6), []);
-  const trending = useMemo(() => products.filter((p) => p.tags.includes('trending')).slice(0, 8), []);
-  const newArrivals = useMemo(() => [...products].sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt)).slice(0, 4), []);
-  const bestSellers = useMemo(() => [...products].sort((a, b) => b.reviewCount - a.reviewCount).slice(0, 4), []);
-  const flashDeals = useMemo(() => products.filter((p) => p.tags.includes('flash-sale')).slice(0, 4), []);
-  const budgetPicks = useMemo(() => [...products].filter((p) => p.price <= BUDGET_CEILING).sort((a, b) => a.price - b.price).slice(0, 4), []);
-  const fashionSlugs = useMemo(() => getSubCategories('fashion').map((c) => c.slug), []);
-  const beautySlugs = useMemo(() => [...getSubCategories('beauty'), ...getSubCategories('jewelry')].map((c) => c.slug), []);
-  const fashionPicks = useMemo(() => products.filter((p) => fashionSlugs.includes(p.category)).slice(0, 4), [fashionSlugs]);
-  const beautyPicks = useMemo(() => products.filter((p) => beautySlugs.includes(p.category)).slice(0, 4), [beautySlugs]);
-  const recommended = useMemo(() => [...products].sort(() => 0.5 - ((Date.now() / 86400000) % 1)).slice(8, 12), []);
+  // Today's Edits — team-curated bestsellers.
+  const todaysPicks = useMemo(() => products.filter((p) => p.tags.includes('bestseller')).slice(0, 6), [products]);
+  // Your's Picks — what the community keeps buying.
+  const yoursPicks = useMemo(() => [...products].sort((a, b) => b.reviewCount - a.reviewCount).slice(0, 6), [products]);
+  // Deals of the Day.
+  const dealsOfTheDay = useMemo(() => products.filter((p) => p.tags.includes('flash-sale')).slice(0, 6), [products]);
+  // Shop Under ৳99.
+  const shopUnder99 = useMemo(
+    () => [...products].filter((p) => p.price <= BUDGET_CEILING).sort((a, b) => a.price - b.price).slice(0, 6),
+    [products]
+  );
+  // New Arrivals.
+  const newArrivals = useMemo(() => [...products].sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt)).slice(0, 6), [products]);
+
+  // One section per main category, entirely data-driven: a category the admin adds today
+  // shows up here on its own with zero code changes, and any with no products stays hidden
+  // (ProductRail already returns null for an empty list).
+  const categorySections = useMemo(
+    () =>
+      mainCategories.map((main) => {
+        const subSlugs = getSubCategories(main.slug).map((c) => c.slug);
+        const categoryProducts = products
+          .filter((p) => p.category === main.slug || subSlugs.includes(p.category))
+          .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
+          .slice(0, 6);
+        return { category: main, products: categoryProducts };
+      }),
+    [mainCategories, getSubCategories, products]
+  );
 
   return (
     <>
       <Hero />
       <PromoPills />
-      <TodaysPicks products={todaysPicks} />
-      <ProductRail eyebrow="এখন ট্রেন্ডিং" title="ট্রেন্ডিং পণ্য" subtitle="এই সপ্তাহে সবাই যা কার্টে যোগ করছেন" products={trending} viewAllTo="/shop" onQuickView={setQuickView} dark />
-      <ProductRail eyebrow="নতুন সংযোজন" title="নতুন পণ্য" subtitle="সদ্য আসা সতেজ সব স্টাইল" products={newArrivals} viewAllTo="/shop?sort=newest" onQuickView={setQuickView} />
-      <ProductRail eyebrow="গ্রাহকদের পছন্দ" title="বেস্ট সেলার" subtitle="আমাদের সম্প্রদায়ের বারবার পছন্দের পণ্য" products={bestSellers} viewAllTo="/shop?sort=popular" onQuickView={setQuickView} />
-      <FlashSale products={flashDeals} onQuickView={setQuickView} />
-      <ReelsSection />
-      <ProductRail eyebrow={`$${BUDGET_CEILING}-এর নিচে`} title="বাজেট কালেকশন" subtitle="সাশ্রয়ী দামে দারুণ সব পছন্দ" products={budgetPicks} viewAllTo="/shop?sort=price-low" onQuickView={setQuickView} />
       <FeaturedBrands />
-      <ProductRail eyebrow="নারী ফ্যাশন" title="ফ্যাশন কালেকশন" subtitle="আজকের জন্য বাছাই করা ফ্যাশন" products={fashionPicks} viewAllTo="/categories/fashion" onQuickView={setQuickView} dark />
-      <ProductRail eyebrow="বিউটি ও জুয়েলারি" title="বিউটি ও জুয়েলারি" subtitle="নিজেকে সাজিয়ে তুলুন প্রতিদিন" products={beautyPicks} viewAllTo="/categories/beauty" onQuickView={setQuickView} />
-      <ProductRail eyebrow="আপনার জন্য বাছাই" title="সুপারিশকৃত পণ্য" subtitle="আপনার পছন্দ অনুযায়ী সাজানো" products={recommended} viewAllTo="/shop" onQuickView={setQuickView} />
+      <TodaysPicks products={todaysPicks} />
+      <ProductRail
+        icon={<Heart />}
+        eyebrow={t('home.yoursPicks.eyebrow')}
+        title={t('home.yoursPicks.title')}
+        subtitle={t('home.yoursPicks.subtitle')}
+        products={yoursPicks}
+        viewAllTo="/shop?sort=popular"
+        onQuickView={setQuickView}
+      />
+      <ProductRail
+        icon={<Zap />}
+        eyebrow={t('home.dealsOfTheDay.eyebrow')}
+        title={t('home.dealsOfTheDay.title')}
+        subtitle={t('home.dealsOfTheDay.subtitle')}
+        products={dealsOfTheDay}
+        viewAllTo="/shop"
+        onQuickView={setQuickView}
+      />
+      <ProductRail
+        icon={<Tag />}
+        eyebrow={t('home.shopUnder99.eyebrow', { amount: BUDGET_CEILING })}
+        title={t('home.shopUnder99.title')}
+        subtitle={t('home.shopUnder99.subtitle')}
+        products={shopUnder99}
+        viewAllTo="/shop?sort=price-low"
+        onQuickView={setQuickView}
+      />
+      <ProductRail
+        icon={<Sparkles />}
+        eyebrow={t('home.newArrivals.eyebrow')}
+        title={t('home.newArrivals.title')}
+        subtitle={t('home.newArrivals.subtitle')}
+        products={newArrivals}
+        viewAllTo="/shop?sort=newest"
+        onQuickView={setQuickView}
+      />
+
+      {categorySections.map(({ category, products: catProducts }) => (
+        <ProductRail
+          key={category.id}
+          icon={<CategoryIcon name={category.icon} />}
+          eyebrow={t('home.categoryRail.eyebrow')}
+          title={category.name}
+          subtitle={t('home.categoryRail.subtitle', { category: category.name })}
+          products={catProducts}
+          viewAllTo={`/categories/${category.slug}`}
+          onQuickView={setQuickView}
+        />
+      ))}
+
       <RecentlyViewedHome onQuickView={setQuickView} />
-      <CustomerReviews />
-      <Newsletter />
-      <InstagramGallery />
       <QuickViewModal product={quickView} onClose={() => setQuickView(null)} />
+      <OfferPopup />
     </>
   );
 }

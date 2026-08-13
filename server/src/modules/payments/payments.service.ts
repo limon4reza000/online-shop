@@ -2,6 +2,7 @@ import axios from 'axios';
 import { env } from '../../config/env.js';
 import { prisma } from '../../lib/prisma.js';
 import { ApiError } from '../../utils/ApiError.js';
+import { emitToAdmins } from '../../sockets/index.js';
 
 const SANDBOX_URL = 'https://sandbox.sslcommerz.com/gwprocess/v4/api.php';
 const LIVE_URL = 'https://securepay.sslcommerz.com/gwprocess/v4/api.php';
@@ -64,4 +65,5 @@ export async function initiatePayment(input: InitPaymentInput) {
 
 export async function markOrderPaid(orderId: string) {
   await prisma.order.update({ where: { id: orderId }, data: { paymentStatus: 'PAID', status: 'PROCESSING' } });
+  emitToAdmins('analytics:update', { reason: 'order:paid', orderId });
 }

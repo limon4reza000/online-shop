@@ -1,0 +1,111 @@
+{
+  "common": {
+    "outOfStock": "স্টক নেই",
+    "viewAll": "সব দেখুন",
+    "addToCart": "কার্টে যোগ করুন",
+    "quickView": "দ্রুত দেখুন",
+    "toggleWishlist": "পছন্দের তালিকা পরিবর্তন করুন",
+    "new": "নতুন",
+    "decreaseQty": "পরিমাণ কমান",
+    "increaseQty": "পরিমাণ বাড়ান",
+    "views": "বার দেখা হয়েছে"
+  },
+  "nav": {
+    "home": "হোম",
+    "shop": "শপ",
+    "categories": "ক্যাটাগরি",
+    "aboutUs": "আমাদের সম্পর্কে",
+    "contact": "যোগাযোগ",
+    "cart": "কার্ট",
+    "notifications": "নোটিফিকেশন",
+    "chat": "চ্যাট",
+    "profile": "প্রোফাইল",
+    "login": "লগইন",
+    "myOrders": "আমার অর্ডার",
+    "wishlist": "উইশলিস্ট",
+    "more": "আরও"
+  },
+  "header": {
+    "openMenu": "মেনু খুলুন",
+    "searchPlaceholder": "পণ্য খুঁজুন...",
+    "tagline": "সহজে কেনাকাটা করুন",
+    "lightMode": "লাইট মোড",
+    "darkMode": "ডার্ক মোড",
+    "adminPanel": "অ্যাডমিন প্যানেল",
+    "dashboard": "ড্যাশবোর্ড",
+    "signOut": "সাইন আউট",
+    "register": "রেজিস্টার"
+  },
+  "sidebar": {
+    "shopSection": "শপ",
+    "accountSection": "আমার অ্যাকাউন্ট",
+    "community": "Community",
+    "light": "লাইট",
+    "dark": "ডার্ক"
+  },
+  "search": {
+    "prefix": "নিত্যঘরে খুঁজুন "
+  },
+  "promoPills": {
+    "newCollectionDaily": "প্রতিদিন নতুন কালেকশন",
+    "secureCheckout": "১০০% নিরাপদ চেকআউট",
+    "cashOnDelivery": "ক্যাশ অন ডেলিভারি সুবিধা",
+    "installApp": "অ্যাপ ইনস্টল করুন",
+    "freeShippingOver": "৳{{amount}}+ অর্ডারে ফ্রি শিপিং",
+    "freeDeliveryOver": "৳{{amount}}+ অর্ডারে ফ্রি ডেলিভারি"
+  },
+  "hero": {
+    "shopNow": "এখনই কিনুন",
+    "fastLabel": "দ্রুত",
+    "deliveryLabel": "ডেলিভারি",
+    "slides": {
+      "0": {
+        "eyebrow": "নতুন সিজনের সংগ্রহ",
+        "titleSmall": "সেরা স্টাইল",
+        "titleAccent": "সেরা মুড",
+        "description": "প্রিমিয়াম ফ্যাশন, বাছাই করা ক্যাপসুল কালেকশন এবং চিরায়ত অত্যাবশ্যকীয় পণ্য আবিষ্কার করুন — প্রতিটি দিনকে বিশেষ করে তুলতে সাজানো।"
+      },
+      "1": {
+        "eyebrow": "বাছাই করা কালেকশন",
+        "titleSmall": "চিরায়ত ছোঁয়া",
+        "titleAccent": "আধুনিক ধাঁচ",
+        "description": "দীর্ঘস্থায়ী হওয়ার জন্য বানানো ওয়ারড্রোব স্টেপলের একটি মার্জিত সংগ্রহ — সযত্নে সংগৃহীত, সহজেই বহুমুখী।"
+      },
+      "2": {
+        "eyebrow": "শুধু সদস্যদের জন্য",
+        "titleSmall": "যুক্ত হয়ে",
+        "titleAccent": "১০% সাশ্রয়",
+        "description": "ফ্রি অ্যাকাউন্ট তৈরি করুন এবং আগাম অ্যাক্সেস, একচেটিয়া মূল্য ও দ্রুত চেকআউটের সুবিধা উপভোগ করুন।"
+      }
+    },
+    "features": {
+      "trustedQuality": "নির্ভরযোগ্য মান",
+      "bestTaste": "সেরা টেস্ট",
+      "premiumQuality": "প্রিমিয়াম কোয়ালিটি",
+      "madeWithLove": "ভালোবাসায় তৈরি"
+    }
+  },
+  "todaysPicks": {
+    "title": "Today's Edits",
+    "eyebrow": "আজকের বাছাই",
+    "subtitle": "আমাদের টিমের হাতে বাছাই করা আজকের সেরা পণ্য"
+  },
+  "home": {
+    "yoursPicks": { "title": "Your's Picks", "eyebrow": "গ্রাহকদের পছন্দ", "subtitle": "আমাদের সম্প্রদায়ের বারবার পছন্দের পণ্য" },
+    "dealsOfTheDay": { "title": "Deals of the Day", "eyebrow": "সীমিত সময়ের অফার", "subtitle": "আজকের বিশেষ ছাড়ে সেরা পছন্দ" },
+    "shopUnder99": { "title": "Shop Under ৳99", "eyebrow": "৳{{amount}}-এর নিচে", "subtitle": "সাশ্রয়ী দামে দারুণ সব পছন্দ" },
+    "newArrivals": { "title": "নতুন পণ্য", "eyebrow": "নতুন সংযোজন", "subtitle": "সদ্য আসা সতেজ সব স্টাইল" },
+    "categoryRail": { "eyebrow": "ক্যাটাগরি", "subtitle": "{{category}} বিভাগের সেরা সব পণ্য" }
+  },
+  "featuredBrands": {
+    "eyebrow": "যাদের আস্থা পেয়েছি",
+    "title": "বিশেষ ব্র্যান্ড",
+    "viewAll": "সব ব্র্যান্ড দেখুন"
+  },
+  "footer": {
+    "sectionLabel": "শেষ কথা",
+    "headlineLead": "দেখা হবে ",
+    "headlineHighlight": "কাল,",
+    "headlineTail": "একই তাকে।"
+  }
+}

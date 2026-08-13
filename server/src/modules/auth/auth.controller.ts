@@ -23,6 +23,12 @@ export const logout = asyncHandler(async (_req: Request, res: Response) => {
   sendSuccess(res, null, 'Logged out');
 });
 
+export const refresh = asyncHandler(async (req: Request, res: Response) => {
+  const result = await authService.refresh(req.cookies?.[REFRESH_COOKIE]);
+  res.cookie(REFRESH_COOKIE, result.refreshToken, cookieOptions);
+  sendSuccess(res, result, 'Session refreshed');
+});
+
 export const verifyOtp = asyncHandler(async (req: Request, res: Response) => {
   const result = await authService.verifyOtp(req.body.email, req.body.code);
   sendSuccess(res, result, 'Email verified successfully');
@@ -46,4 +52,14 @@ export const resetPassword = asyncHandler(async (req: Request, res: Response) =>
 export const me = asyncHandler(async (req: Request, res: Response) => {
   const user = await authService.getMe(req.user!.id);
   sendSuccess(res, user);
+});
+
+export const updateProfile = asyncHandler(async (req: Request, res: Response) => {
+  const user = await authService.updateProfile(req.user!.id, req.body);
+  sendSuccess(res, user, 'Profile updated');
+});
+
+export const changePassword = asyncHandler(async (req: Request, res: Response) => {
+  await authService.changePassword(req.user!.id, req.body.currentPassword, req.body.newPassword);
+  sendSuccess(res, null, 'Password changed successfully');
 });

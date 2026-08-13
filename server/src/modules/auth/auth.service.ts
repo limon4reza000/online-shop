@@ -1,9 +1,9 @@
 import { prisma } from '../../lib/prisma.js';
 import { hashPassword, comparePassword } from '../../utils/hash.js';
-import { generateOtp, signAccessToken, signRefreshToken } from '../../utils/jwt.js';
+import { generateOtp, signAccessToken, signRefreshToken, verifyRefreshToken } from '../../utils/jwt.js';
 import { ApiError } from '../../utils/ApiError.js';
 import { sendEmail, emailTemplates } from '../../config/mailer.js';
-import type { RegisterInput, LoginInput } from './auth.schema.js';
+import type { RegisterInput, LoginInput, UpdateProfileInput } from './auth.schema.js';
 
 const OTP_TTL_MS = 10 * 60 * 1000;
 
@@ -14,8 +14,12 @@ function issueTokens(user: { id: string; role: string }) {
 
 function toPublicUser(user: {
   id: string; name: string; email: string; role: string; emailVerified: boolean; avatarUrl: string | null;
+  phone: string | null; dateOfBirth: Date | null; gender: string | null;
 }) {
-  return { id: user.id, name: user.name, email: user.email, role: user.role, emailVerified: user.emailVerified, avatarUrl: user.avatarUrl };
+  return {
+    id: user.id, name: user.name, email: user.email, role: user.role, emailVerified: user.emailVerified,
+    avatarUrl: user.avatarUrl, phone: user.phone, dateOfBirth: user.dateOfBirth, gender: user.gender,
+  };
 }
 
 export async function register(input: RegisterInput) {
@@ -105,8 +109,50 @@ export async function resetPassword(token: string, newPassword: string) {
   });
 }
 
+export async function refresh(refreshToken: string | undefined) {
+  if (!refreshToken) throw ApiError.unauthorized('No refresh token provided');
+
+  let payload;
+  try {
+    payload = verifyRefreshToken(refreshToken);
+  } catch {
+    throw ApiError.unauthorized('Refresh token is invalid or expired');
+  }
+
+  const user = await prisma.user.findUnique({ where: { id: payload.sub } });
+  if (!user) throw ApiError.unauthorized('User not found');
+  if (user.status === 'blocked') throw ApiError.forbidden('This account has been blocked');
+
+  return { user: toPublicUser(user), ...issueTokens(user) };
+}
+
 export async function getMe(userId: string) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) throw ApiError.notFound('User not found');
   return toPublicUser(user);
+}
+
+export async function updateProfile(userId: string, input: UpdateProfileInput) {
+  const user = await prisma.user.update({
+    where: { id: userId },
+    data: {
+      ...(input.name !== undefined && { name: input.name }),
+      ...(input.phone !== undefined && { phone: input.phone }),
+      ...(input.dateOfBirth !== undefined && { dateOfBirth: input.dateOfBirth ? new Date(input.dateOfBirth) : null }),
+      ...(input.gender !== undefined && { gender: input.gender }),
+      ...(input.avatarUrl !== undefined && { avatarUrl: input.avatarUrl }),
+    },
+  });
+  return toPublicUser(user);
+}
+
+export async function changePassword(userId: string, currentPassword: string, newPassword: string) {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user || !user.password) throw ApiError.badRequest('Password change is not available for this account');
+
+  const valid = await comparePassword(currentPassword, user.password);
+  if (!valid) throw ApiError.unauthorized('বর্তমান পাসওয়ার্ড সঠিক নয়');
+
+  const password = await hashPassword(newPassword);
+  await prisma.user.update({ where: { id: userId }, data: { password } });
 }

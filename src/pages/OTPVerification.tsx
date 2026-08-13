@@ -1,17 +1,20 @@
 import { useRef, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { Seo } from '@/components/ui/Seo';
+import { PageLoader } from '@/components/ui/PageLoader';
 
 const LENGTH = 6;
 
 export default function OTPVerification() {
-  const { user, verifyOtp, resendOtp } = useAuth();
+  const { user, isLoading, verifyOtp, resendOtp } = useAuth();
   const [digits, setDigits] = useState<string[]>(Array(LENGTH).fill(''));
+  const [submitting, setSubmitting] = useState(false);
   const inputs = useRef<(HTMLInputElement | null)[]>([]);
   const navigate = useNavigate();
 
+  if (isLoading) return <PageLoader />;
   if (!user) return <Navigate to="/register" replace />;
   if (user.emailVerified) return <Navigate to="/dashboard" replace />;
 
@@ -35,9 +38,12 @@ export default function OTPVerification() {
     inputs.current[Math.min(text.length, LENGTH - 1)]?.focus();
   };
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (verifyOtp(digits.join(''))) navigate('/dashboard');
+    setSubmitting(true);
+    const ok = await verifyOtp(digits.join(''));
+    setSubmitting(false);
+    if (ok) navigate('/dashboard');
   };
 
   return (
@@ -66,10 +72,11 @@ export default function OTPVerification() {
               />
             ))}
           </div>
-          <button type="submit" className="btn-primary w-full mt-8">যাচাই করুন ও চালিয়ে যান</button>
+          <button type="submit" disabled={submitting || digits.some((d) => !d)} className="btn-primary w-full mt-8 disabled:opacity-60">
+            {submitting ? <Loader2 size={16} className="animate-spin" /> : 'যাচাই করুন ও চালিয়ে যান'}
+          </button>
         </form>
-        <button onClick={resendOtp} className="text-sm text-primary font-semibold mt-4 hover:underline">কোড আবার পাঠান</button>
-        <p className="mt-2 text-xs text-text-secondary">ডেমো: যাচাই করতে যেকোনো ৬টি সংখ্যা লিখুন।</p>
+        <button onClick={() => resendOtp()} className="text-sm text-primary font-semibold mt-4 hover:underline">কোড আবার পাঠান</button>
       </div>
     </div>
   );

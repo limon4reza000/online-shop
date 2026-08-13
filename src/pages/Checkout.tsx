@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -6,7 +6,9 @@ import { z } from 'zod';
 import { Wallet, ShieldCheck, Send } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useCart } from '@/context/CartContext';
-import { products } from '@/lib/data';
+import { useProducts } from '@/hooks/useProducts';
+import { useCreateOrder } from '@/hooks/useOrders';
+import { useToast } from '@/context/ToastContext';
 import { formatPrice } from '@/lib/format';
 import bkashLogo from '@/assets/BKash-bKash-Logo.wine.png';
 import nagadLogo from '@/assets/Nagad-Logo.wine.svg';
@@ -28,10 +30,13 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export default function Checkout() {
-  const { items, subtotal, deliveryCharge, vat, discount, clearCart } = useCart();
+  const { items, subtotal, deliveryCharge, vat, discount, coupon, clearCart, shippingDetails, clearShippingDetails } = useCart();
+  const { data: products = [] } = useProducts();
   const [step, setStep] = useState(0);
   const [placing, setPlacing] = useState(false);
   const navigate = useNavigate();
+  const { showToast } = useToast();
+  const createOrder = useCreateOrder();
 
   const { register, handleSubmit, trigger, watch, setValue, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -51,13 +56,59 @@ export default function Checkout() {
     if (valid) setStep((s) => s + 1);
   };
 
+  // Customer info is collected (and validated) on the Cart page — checkout can't
+  // proceed without it, whether the user skipped that step or landed here directly.
+  useEffect(() => {
+    if (!shippingDetails && lineItems.length > 0) {
+      navigate('/cart', { replace: true });
+    }
+  }, [shippingDetails, lineItems.length, navigate]);
+
   const onSubmit = () => {
+    if (!shippingDetails) {
+      navigate('/cart', { replace: true });
+      return;
+    }
     setPlacing(true);
-    setTimeout(() => {
-      const orderId = `ORD-${Math.floor(10000 + Math.random() * 89999)}`;
-      clearCart();
-      navigate('/order-success', { state: { orderId, total } });
-    }, 1400);
+    createOrder.mutate(
+      {
+        items: lineItems.map(({ item, product }) => ({
+          productId: item.productId,
+          quantity: item.quantity,
+          price: product.price,
+          color: item.color,
+          size: item.size,
+        })),
+        subtotal,
+        discount,
+        shipping: deliveryCharge,
+        tax: vat,
+        total,
+        couponCode: coupon ?? undefined,
+        shippingAddress: {
+          fullName: shippingDetails.fullName,
+          phone: shippingDetails.mobile,
+          address: shippingDetails.address,
+          village: shippingDetails.village,
+          postOffice: shippingDetails.postOffice,
+          upazila: shippingDetails.upazila,
+          district: shippingDetails.district,
+          division: shippingDetails.division,
+          note: shippingDetails.note,
+        },
+      },
+      {
+        onSuccess: (order) => {
+          clearCart();
+          clearShippingDetails();
+          navigate('/order-success', { state: { orderId: order.id, total } });
+        },
+        onError: () => {
+          setPlacing(false);
+          showToast('অর্ডার করা যায়নি, আবার চেষ্টা করুন', 'error');
+        },
+      }
+    );
   };
 
   if (lineItems.length === 0 && !placing) {

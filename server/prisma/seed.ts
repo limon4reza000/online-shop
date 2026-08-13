@@ -3,106 +3,106 @@ import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
-const CATEGORY_TREE: { name: string; slug: string; icon: string; children: { name: string; slug: string }[] }[] = [
+const CATEGORY_TREE: { name: string; slug: string; icon: string; children: { name: string; slug: string; icon: string }[] }[] = [
   {
-    name: 'ফ্যাশন', slug: 'fashion', icon: '👗',
+    name: 'ফ্যাশন', slug: 'fashion', icon: 'shirt',
     children: [
-      { name: 'শাড়ি', slug: 'saree' },
-      { name: 'থ্রি-পিস', slug: 'three-piece' },
-      { name: 'কুর্তি', slug: 'kurti' },
-      { name: 'টপস', slug: 'tops' },
-      { name: 'টি-শার্ট', slug: 't-shirt' },
-      { name: 'জিন্স', slug: 'jeans' },
-      { name: 'হিজাব', slug: 'hijab' },
-      { name: 'হ্যান্ডব্যাগ', slug: 'handbag' },
-      { name: 'ভ্যানিটি ব্যাগ', slug: 'vanity-bag' },
-      { name: 'সানগ্লাস', slug: 'sunglasses' },
+      { name: 'শাড়ি', slug: 'saree', icon: 'person-dress' },
+      { name: 'থ্রি-পিস', slug: 'three-piece', icon: 'person-dress' },
+      { name: 'কুর্তি', slug: 'kurti', icon: 'shirt' },
+      { name: 'টপস', slug: 'tops', icon: 'shirt' },
+      { name: 'টি-শার্ট', slug: 't-shirt', icon: 'shirt' },
+      { name: 'জিন্স', slug: 'jeans', icon: 'shirt' },
+      { name: 'হিজাব', slug: 'hijab', icon: 'hijab' },
+      { name: 'হ্যান্ডব্যাগ', slug: 'handbag', icon: 'bag-shopping' },
+      { name: 'ভ্যানিটি ব্যাগ', slug: 'vanity-bag', icon: 'suitcase' },
+      { name: 'সানগ্লাস', slug: 'sunglasses', icon: 'glasses' },
     ],
   },
   {
-    name: 'ইনারওয়্যার', slug: 'innerwear', icon: '👙',
+    name: 'ইনারওয়্যার', slug: 'innerwear', icon: 'vest',
     children: [
-      { name: 'বক্ষবন্ধনী (ব্রা)', slug: 'bra' },
-      { name: 'আন্ডারওয়্যার', slug: 'underwear' },
+      { name: 'বক্ষবন্ধনী (ব্রা)', slug: 'bra', icon: 'bra' },
+      { name: 'আন্ডারওয়্যার', slug: 'underwear', icon: 'underwear' },
     ],
   },
   {
-    name: 'জুয়েলারি', slug: 'jewelry', icon: '💍',
+    name: 'জুয়েলারি', slug: 'jewelry', icon: 'gem',
     children: [
-      { name: 'আংটি', slug: 'ring' },
-      { name: 'নেকলেস', slug: 'necklace' },
-      { name: 'কানের দুল', slug: 'earrings' },
-      { name: 'ব্রেসলেট', slug: 'bracelet' },
-      { name: 'পায়েল', slug: 'anklet' },
-      { name: 'ঘড়ি', slug: 'watch' },
+      { name: 'আংটি', slug: 'ring', icon: 'ring' },
+      { name: 'নেকলেস', slug: 'necklace', icon: 'necklace' },
+      { name: 'কানের দুল', slug: 'earrings', icon: 'earrings' },
+      { name: 'ব্রেসলেট', slug: 'bracelet', icon: 'bracelet' },
+      { name: 'পায়েল', slug: 'anklet', icon: 'bracelet' },
+      { name: 'ঘড়ি', slug: 'watch', icon: 'clock' },
     ],
   },
   {
-    name: 'বিউটি', slug: 'beauty', icon: '💄',
+    name: 'বিউটি', slug: 'beauty', icon: 'wand-magic-sparkles',
     children: [
-      { name: 'মেকআপ', slug: 'makeup' },
-      { name: 'লিপস্টিক', slug: 'lipstick' },
-      { name: 'ফাউন্ডেশন', slug: 'foundation' },
-      { name: 'আইলাইনার', slug: 'eyeliner' },
-      { name: 'মাসকারা', slug: 'mascara' },
-      { name: 'ব্লাশ', slug: 'blush' },
-      { name: 'নেইল পলিশ', slug: 'nail-polish' },
+      { name: 'মেকআপ', slug: 'makeup', icon: 'paintbrush' },
+      { name: 'লিপস্টিক', slug: 'lipstick', icon: 'lipstick' },
+      { name: 'ফাউন্ডেশন', slug: 'foundation', icon: 'bottle-droplet' },
+      { name: 'আইলাইনার', slug: 'eyeliner', icon: 'pencil' },
+      { name: 'মাসকারা', slug: 'mascara', icon: 'paintbrush' },
+      { name: 'ব্লাশ', slug: 'blush', icon: 'palette' },
+      { name: 'নেইল পলিশ', slug: 'nail-polish', icon: 'nail-polish' },
     ],
   },
   {
-    name: 'বডি অ্যান্ড স্কিন কেয়ার', slug: 'body-skin-care', icon: '🧴',
+    name: 'বডি অ্যান্ড স্কিন কেয়ার', slug: 'body-skin-care', icon: 'spa',
     children: [
-      { name: 'ফেসওয়াশ', slug: 'face-wash' },
-      { name: 'সানস্ক্রিন', slug: 'sunscreen' },
-      { name: 'স্কিন কেয়ার', slug: 'skin-care' },
-      { name: 'বডি লোশন', slug: 'body-lotion' },
-      { name: 'পারফিউম', slug: 'perfume' },
-      { name: 'বডি স্প্রে', slug: 'body-spray' },
+      { name: 'ফেসওয়াশ', slug: 'face-wash', icon: 'pump-soap' },
+      { name: 'সানস্ক্রিন', slug: 'sunscreen', icon: 'sun' },
+      { name: 'স্কিন কেয়ার', slug: 'skin-care', icon: 'spa' },
+      { name: 'বডি লোশন', slug: 'body-lotion', icon: 'bottle-droplet' },
+      { name: 'পারফিউম', slug: 'perfume', icon: 'flask' },
+      { name: 'বডি স্প্রে', slug: 'body-spray', icon: 'spray-can-sparkles' },
     ],
   },
   {
-    name: 'হেয়ার কেয়ার', slug: 'hair-care', icon: '💇',
+    name: 'হেয়ার কেয়ার', slug: 'hair-care', icon: 'scissors',
     children: [
-      { name: 'শ্যাম্পু', slug: 'shampoo' },
-      { name: 'কন্ডিশনার', slug: 'conditioner' },
-      { name: 'হেয়ার অয়েল', slug: 'hair-oil' },
-      { name: 'হেয়ার সিরাম', slug: 'hair-serum' },
-      { name: 'হেয়ার মাস্ক', slug: 'hair-mask' },
-      { name: 'হেয়ার কালার', slug: 'hair-color' },
-      { name: 'হেয়ার অ্যাকসেসরিজ', slug: 'hair-accessories' },
+      { name: 'শ্যাম্পু', slug: 'shampoo', icon: 'pump-soap' },
+      { name: 'কন্ডিশনার', slug: 'conditioner', icon: 'bottle-droplet' },
+      { name: 'হেয়ার অয়েল', slug: 'hair-oil', icon: 'vial' },
+      { name: 'হেয়ার সিরাম', slug: 'hair-serum', icon: 'vial' },
+      { name: 'হেয়ার মাস্ক', slug: 'hair-mask', icon: 'mask' },
+      { name: 'হেয়ার কালার', slug: 'hair-color', icon: 'palette' },
+      { name: 'হেয়ার অ্যাকসেসরিজ', slug: 'hair-accessories', icon: 'gem' },
     ],
   },
   {
-    name: 'গ্রুমিং প্রোডাক্টস', slug: 'grooming', icon: '🪒',
+    name: 'গ্রুমিং প্রোডাক্টস', slug: 'grooming', icon: 'pump-soap',
     children: [
-      { name: 'বডি রেজার', slug: 'body-razor' },
-      { name: 'এপিলেটর', slug: 'epilator' },
-      { name: 'ট্রিমার', slug: 'trimmer' },
-      { name: 'অন্যান্য', slug: 'grooming-others' },
+      { name: 'বডি রেজার', slug: 'body-razor', icon: 'body-razor' },
+      { name: 'এপিলেটর', slug: 'epilator', icon: 'bolt-lightning' },
+      { name: 'ট্রিমার', slug: 'trimmer', icon: 'scissors' },
+      { name: 'অন্যান্য', slug: 'grooming-others', icon: 'tag' },
     ],
   },
   {
-    name: 'কিডস', slug: 'kids', icon: '🧸',
+    name: 'কিডস', slug: 'kids', icon: 'baby-carriage',
     children: [
-      { name: 'বেবি ড্রেস', slug: 'baby-dress' },
-      { name: 'বেবি জুতা', slug: 'baby-shoes' },
-      { name: 'স্কুল ব্যাগ', slug: 'school-bag' },
-      { name: 'খেলনা', slug: 'toys' },
-      { name: 'ফিডিং বোতল', slug: 'feeding-bottle' },
-      { name: 'বেবি কেয়ার', slug: 'baby-care' },
+      { name: 'বেবি ড্রেস', slug: 'baby-dress', icon: 'baby' },
+      { name: 'বেবি জুতা', slug: 'baby-shoes', icon: 'shoe-prints' },
+      { name: 'স্কুল ব্যাগ', slug: 'school-bag', icon: 'bag-shopping' },
+      { name: 'খেলনা', slug: 'toys', icon: 'puzzle-piece' },
+      { name: 'ফিডিং বোতল', slug: 'feeding-bottle', icon: 'bottle-water' },
+      { name: 'বেবি কেয়ার', slug: 'baby-care', icon: 'baby-carriage' },
     ],
   },
   {
-    name: 'হোম ডেকোর', slug: 'home-decor', icon: '🏡',
+    name: 'হোম ডেকোর', slug: 'home-decor', icon: 'couch',
     children: [
-      { name: 'দেয়াল সজ্জা', slug: 'wall-decor' },
-      { name: 'আর্টিফিশিয়াল প্লান্ট', slug: 'artificial-plant' },
-      { name: 'ফুলদানি', slug: 'vase' },
-      { name: 'টেবিল সজ্জা', slug: 'table-decor' },
-      { name: 'আলোসজ্জা', slug: 'lighting' },
-      { name: 'পর্দা', slug: 'curtain' },
-      { name: 'কিচেন অ্যাকসেসরিজ', slug: 'kitchen-accessories' },
-      { name: 'স্টোরেজ ও অর্গানাইজার', slug: 'storage-organizer' },
+      { name: 'দেয়াল সজ্জা', slug: 'wall-decor', icon: 'images' },
+      { name: 'আর্টিফিশিয়াল প্লান্ট', slug: 'artificial-plant', icon: 'seedling' },
+      { name: 'ফুলদানি', slug: 'vase', icon: 'wine-bottle' },
+      { name: 'টেবিল সজ্জা', slug: 'table-decor', icon: 'table' },
+      { name: 'আলোসজ্জা', slug: 'lighting', icon: 'lightbulb' },
+      { name: 'পর্দা', slug: 'curtain', icon: 'tag' },
+      { name: 'কিচেন অ্যাকসেসরিজ', slug: 'kitchen-accessories', icon: 'utensils' },
+      { name: 'স্টোরেজ ও অর্গানাইজার', slug: 'storage-organizer', icon: 'box-archive' },
     ],
   },
 ];
@@ -120,21 +120,47 @@ async function main() {
     const main = CATEGORY_TREE[i];
     const mainCategory = await prisma.category.upsert({
       where: { slug: main.slug },
-      update: { name: main.name, icon: main.icon, sortOrder: i },
-      create: { name: main.name, slug: main.slug, icon: main.icon, sortOrder: i },
+      update: {
+        name: main.name,
+        icon: main.icon,
+        sortOrder: i,
+        image: `https://picsum.photos/seed/cat-${main.slug}/600/700`,
+        banner: `https://picsum.photos/seed/banner-${main.slug}/1600/500`,
+      },
+      create: {
+        name: main.name,
+        slug: main.slug,
+        icon: main.icon,
+        sortOrder: i,
+        image: `https://picsum.photos/seed/cat-${main.slug}/600/700`,
+        banner: `https://picsum.photos/seed/banner-${main.slug}/1600/500`,
+      },
     });
 
     for (let j = 0; j < main.children.length; j++) {
       const sub = main.children[j];
       const subCategory = await prisma.category.upsert({
         where: { slug: sub.slug },
-        update: { name: sub.name, parentId: mainCategory.id, sortOrder: j },
+        update: {
+          name: sub.name, icon: sub.icon, parentId: mainCategory.id, sortOrder: j,
+          bannerImages: [
+            `https://picsum.photos/seed/subbanner-${sub.slug}-1/1600/600`,
+            `https://picsum.photos/seed/subbanner-${sub.slug}-2/1600/600`,
+            `https://picsum.photos/seed/subbanner-${sub.slug}-3/1600/600`,
+          ],
+        },
         create: {
           name: sub.name,
           slug: sub.slug,
+          icon: sub.icon,
           parentId: mainCategory.id,
           sortOrder: j,
           image: `https://picsum.photos/seed/cat-${sub.slug}/400/400`,
+          bannerImages: [
+            `https://picsum.photos/seed/subbanner-${sub.slug}-1/1600/600`,
+            `https://picsum.photos/seed/subbanner-${sub.slug}-2/1600/600`,
+            `https://picsum.photos/seed/subbanner-${sub.slug}-3/1600/600`,
+          ],
         },
       });
       leafCategories.push({ id: subCategory.id, slug: subCategory.slug });
@@ -142,10 +168,21 @@ async function main() {
   }
 
   const brands = await Promise.all(
-    ['Aurelia', 'Nord & Co', 'Velvet Row', 'Marchetti'].map((name) =>
-      prisma.brand.upsert({ where: { name }, update: {}, create: { name } })
-    )
-  );
+  ['Aurelia', 'Nord & Co', 'Velvet Row', 'Marchetti'].map((name) =>
+    prisma.brand.upsert({
+      where: { name },
+      update: {},
+      create: {
+        name,
+        slug: name
+          .toLowerCase()
+          .replace(/&/g, 'and')
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-|-$/g, ''),
+      },
+    })
+  )
+);
 
   const existingProducts = await prisma.product.count();
   if (existingProducts === 0) {
@@ -167,7 +204,11 @@ async function main() {
             images: [`https://picsum.photos/seed/seed-${i}/900/1100`],
             categoryId: category.id,
             brandId: brands[i % brands.length].id,
-            tags: i % 3 === 0 ? ['bestseller'] : [],
+            tags: [
+              i % 3 === 0 ? 'bestseller' : '',
+              i % 4 === 1 ? 'trending' : '',
+              i % 5 === 2 ? 'flash-sale' : '',
+            ].filter(Boolean),
             isFeatured: i % 4 === 0,
             isBestSeller: i % 3 === 0,
             isNewArrival: i % 5 === 0,

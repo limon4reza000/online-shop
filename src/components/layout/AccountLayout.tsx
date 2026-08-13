@@ -1,16 +1,17 @@
 import { NavLink, Navigate, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Package, User, LogOut, Heart, MapPin, Bell, Star } from 'lucide-react';
+import { LayoutDashboard, Package, User, LogOut, Heart, MapPin, Bell, Star, MessageCircle } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useAuth } from '@/context/AuthContext';
 
 const links = [
   { to: '/dashboard', label: 'ড্যাশবোর্ড', icon: LayoutDashboard },
+  { to: '/profile', label: 'প্রোফাইল', icon: User },
+  { to: '/addresses', label: 'ঠিকানা', icon: MapPin },
   { to: '/orders', label: 'আমার অর্ডার', icon: Package },
   { to: '/wishlist', label: 'উইশলিস্ট', icon: Heart },
   { to: '/reviews', label: 'রিভিউ', icon: Star },
-  { to: '/addresses', label: 'ঠিকানা', icon: MapPin },
   { to: '/notifications', label: 'নোটিফিকেশন', icon: Bell },
-  { to: '/profile', label: 'প্রোফাইল', icon: User },
+  { to: '/chat', label: 'চ্যাট', icon: MessageCircle },
 ];
 
 export function AccountLayout() {

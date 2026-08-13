@@ -15,7 +15,7 @@ uploadRouter.post('/', protect, authorize('ADMIN', 'MANAGER'), upload.single('im
   if (!req.file) throw ApiError.badRequest('No file uploaded');
 
   const remoteUrl = await uploadImage(req.file.path);
-  const url = remoteUrl || `/uploads/${req.file.filename}`;
+  const url = remoteUrl || `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
 
   sendSuccess(res, { url }, 'File uploaded', 201);
 }));

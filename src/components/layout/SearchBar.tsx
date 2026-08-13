@@ -5,8 +5,6 @@ import { useTypewriter } from '@/hooks/useTypewriter';
 import { usePublicSearchPlaceholders } from '@/hooks/useSearchPlaceholders';
 import { useLanguage } from '@/context/LanguageContext';
 
-const SEARCH_PREFIX = 'নিত্যঘরে খুঁজুন ';
-
 // Shown until the backend list loads (or if it's unreachable) so the animation never renders empty.
 const FALLBACK_WORDS = [
   'শাড়ি', 'চুড়ি', 'আংটি', 'ঘড়ি', 'কানের দুল', 'নেকলেস', 'ব্রেসলেট', 'কসমেটিকস', 'সানগ্লাস', 'ফেসওয়াশ',
@@ -25,7 +23,10 @@ export function SearchBar() {
 
   const submitSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (query.trim()) navigate(`/search?q=${encodeURIComponent(query.trim())}`);
+    if (query.trim()) {
+      navigate(`/search?q=${encodeURIComponent(query.trim())}`);
+      setQuery('');
+    }
   };
 
   return (
@@ -36,12 +37,12 @@ export function SearchBar() {
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            aria-label={`${t(SEARCH_PREFIX)}${animatedWord}`}
+            aria-label={`${t('search.prefix')}${animatedWord}`}
             className="w-full rounded-lg border-none bg-gray-200 pl-11 pr-4 py-3.5 text-sm text-text-primary outline-none focus:ring-4 focus:ring-primary/10 transition-all"
           />
           {!query && (
             <span className="pointer-events-none absolute left-11 top-1/2 -translate-y-1/2 text-sm whitespace-nowrap overflow-hidden">
-              <span className="text-text-secondary">{t(SEARCH_PREFIX)}</span>
+              <span className="text-text-secondary">{t('search.prefix')}</span>
               <span className="text-primary font-medium">&ldquo;{animatedWord}</span>
               <span className="inline-block w-px h-4 -mb-0.5 bg-primary animate-blink-caret" />
               <span className="text-primary font-medium">&rdquo;</span>
