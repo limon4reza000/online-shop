@@ -89,7 +89,7 @@ export default function AdminDashboard() {
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
-              <div ref={revenueScroll.ref} onScroll={revenueScroll.onScroll} className="flex-1 min-w-0 overflow-x-scroll chart-x-scroll">
+              <div ref={revenueScroll.ref} onScroll={revenueScroll.onScroll} className="flex-1 min-w-0 overflow-x-auto no-scrollbar">
                 <div style={{ minWidth: revenueData.length * MIN_TICK_WIDTH, width: '100%' }}>
                   <ResponsiveContainer width="100%" height={280}>
                     <AreaChart data={revenueData} margin={{ top: 5, right: 8, left: 0, bottom: 0 }}>
@@ -148,7 +148,7 @@ export default function AdminDashboard() {
                 </BarChart>
               </ResponsiveContainer>
             </div>
-            <div ref={ordersScroll.ref} onScroll={ordersScroll.onScroll} className="flex-1 min-w-0 overflow-x-scroll chart-x-scroll">
+            <div ref={ordersScroll.ref} onScroll={ordersScroll.onScroll} className="flex-1 min-w-0 overflow-x-auto no-scrollbar">
               <div style={{ minWidth: revenueData.length * MIN_TICK_WIDTH, width: '100%' }}>
                 <ResponsiveContainer width="100%" height={260}>
                   <BarChart data={revenueData} margin={{ top: 5, right: 8, left: 0, bottom: 0 }}>
