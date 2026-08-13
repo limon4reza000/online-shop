@@ -203,6 +203,14 @@
   .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
   .sidebar-scroll::-webkit-scrollbar-thumb { background-color: var(--color-primary-light); border-radius: 9999px; }
   .sidebar-scroll::-webkit-scrollbar-thumb:hover { background-color: var(--color-primary); }
+
+  /* Always-visible horizontal scrollbar for scroll-wide charts — deliberately more
+     prominent than sidebar-scroll so it reads as an affordance, not decoration. */
+  .chart-x-scroll { scrollbar-width: thin; scrollbar-color: var(--color-primary) var(--color-primary-light); }
+  .chart-x-scroll::-webkit-scrollbar { height: 8px; }
+  .chart-x-scroll::-webkit-scrollbar-track { background: var(--color-primary-light); border-radius: 9999px; }
+  .chart-x-scroll::-webkit-scrollbar-thumb { background-color: var(--color-primary); border-radius: 9999px; }
+  .chart-x-scroll::-webkit-scrollbar-thumb:hover { background-color: var(--color-primary-hover); }
 }
 
 * {

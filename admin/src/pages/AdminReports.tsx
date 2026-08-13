@@ -5,6 +5,16 @@ import { StatCard } from '@/components/admin/StatCard';
 import { formatPrice } from '@/lib/format';
 import { Banknote, TrendingUp, Package, Percent } from 'lucide-react';
 import { useSalesReport, useCategorySales, useWeeklyProfit, useTopProducts } from '@/hooks/useAnalytics';
+import { useScrollTrack } from '@/hooks/useScrollTrack';
+
+function ChartScrollBar({ thumbWidth, thumbLeft }: { thumbWidth: number; thumbLeft: number }) {
+  if (thumbWidth >= 100) return null;
+  return (
+    <div className="mt-2 h-1.5 rounded-full bg-primary-light overflow-hidden" style={{ marginLeft: 56 }}>
+      <div className="h-full bg-primary rounded-full" style={{ width: `${thumbWidth}%`, marginLeft: `${thumbLeft}%` }} />
+    </div>
+  );
+}
 
 // Minimum horizontal room per week tick — once the data won't fit the card at this
 // width, the chart body scrolls sideways while the Y-axis (its own tiny fixed chart
@@ -16,6 +26,7 @@ export default function AdminReports() {
   const { data: salesByCategory = [], isLoading: categoryLoading } = useCategorySales();
   const { data: profitTrend = [], isLoading: profitLoading } = useWeeklyProfit(6);
   const { data: topProducts = [], isLoading: productsLoading } = useTopProducts(6);
+  const profitScroll = useScrollTrack<HTMLDivElement>([profitTrend.length]);
 
   return (
     <div className="space-y-6">
@@ -55,20 +66,22 @@ export default function AdminReports() {
           )}
         </div>
 
-        <div className="card-surface p-5">
+        <div className="card-surface p-5 min-w-0">
           <h3 className="font-bold mb-4">সাপ্তাহিক মুনাফার প্রবণতা</h3>
           {profitLoading ? (
             <div className="h-70 grid place-items-center"><Loader2 size={24} className="animate-spin text-primary/40" /></div>
           ) : (
             <div className="flex">
-              <div className="shrink-0" style={{ width: 44 }}>
+              <div className="shrink-0" style={{ width: 56 }}>
                 <ResponsiveContainer width="100%" height={280}>
                   <LineChart data={profitTrend} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
-                    <YAxis tick={{ fontSize: 12, fill: '#6B7280' }} axisLine={false} tickLine={false} tickFormatter={(v) => `৳${v / 1000}k`} width={44} />
+                    <YAxis tick={{ fontSize: 12, fill: '#6B7280' }} axisLine={false} tickLine={false} tickFormatter={(v) => `৳${v / 1000}k`} width={56} />
+                    {/* Invisible — only here so this chart computes the same domain/ticks as the real one alongside it. */}
+                    <Line dataKey="profit" stroke="none" dot={false} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
-              <div className="flex-1 min-w-0 overflow-x-auto sidebar-scroll">
+              <div ref={profitScroll.ref} onScroll={profitScroll.onScroll} className="flex-1 min-w-0 overflow-x-scroll chart-x-scroll">
                 <div style={{ minWidth: profitTrend.length * MIN_TICK_WIDTH, width: '100%' }}>
                   <ResponsiveContainer width="100%" height={280}>
                     <LineChart data={profitTrend} margin={{ top: 5, right: 8, left: 0, bottom: 0 }}>
@@ -83,6 +96,7 @@ export default function AdminReports() {
               </div>
             </div>
           )}
+          {!profitLoading && <ChartScrollBar thumbWidth={profitScroll.metrics.thumbWidth} thumbLeft={profitScroll.metrics.thumbLeft} />}
         </div>
       </div>
 

@@ -5,6 +5,16 @@ import { Seo } from '@/components/ui/Seo';
 import { formatPrice } from '@/lib/format';
 import { useAnalyticsSummary, useRevenueTrend, useCategorySales } from '@/hooks/useAnalytics';
 import { useAdminOrders, type OrderStatus } from '@/hooks/useOrders';
+import { useScrollTrack } from '@/hooks/useScrollTrack';
+
+function ChartScrollBar({ thumbWidth, thumbLeft }: { thumbWidth: number; thumbLeft: number }) {
+  if (thumbWidth >= 100) return null;
+  return (
+    <div className="mt-2 h-1.5 rounded-full bg-primary-light overflow-hidden" style={{ marginLeft: 56 }}>
+      <div className="h-full bg-primary rounded-full" style={{ width: `${thumbWidth}%`, marginLeft: `${thumbLeft}%` }} />
+    </div>
+  );
+}
 
 // Full month name always shown; on mobile it's angled (rotated) so all 7 still fit without overlapping.
 function MonthTick({ x = 0, y = 0, payload = { value: '' } }: { x?: number; y?: number; payload?: { value: string } }) {
@@ -46,6 +56,8 @@ export default function AdminDashboard() {
   const { data: revenueData = [], isLoading: revenueLoading } = useRevenueTrend(7);
   const { data: categoryData = [], isLoading: categoryLoading } = useCategorySales();
   const { data: recentOrders, isLoading: ordersLoading } = useAdminOrders({ page: 1, pageSize: 6 });
+  const revenueScroll = useScrollTrack<HTMLDivElement>([revenueData.length]);
+  const ordersScroll = useScrollTrack<HTMLDivElement>([revenueData.length]);
 
   return (
     <div className="space-y-6">
@@ -63,20 +75,22 @@ export default function AdminDashboard() {
       </div>
 
       <div className="grid lg:grid-cols-3 gap-5">
-        <div className="card-surface p-5 lg:col-span-2">
+        <div className="card-surface p-5 lg:col-span-2 min-w-0">
           <h3 className="font-bold mb-4">আয়ের সারসংক্ষেপ</h3>
           {revenueLoading ? (
             <div className="h-70 grid place-items-center"><Loader2 size={24} className="animate-spin text-primary/40" /></div>
           ) : (
             <div className="flex">
-              <div className="shrink-0" style={{ width: 44 }}>
+              <div className="shrink-0" style={{ width: 56 }}>
                 <ResponsiveContainer width="100%" height={280}>
                   <AreaChart data={revenueData} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
-                    <YAxis tick={{ fontSize: 12, fill: '#6B7280' }} axisLine={false} tickLine={false} tickFormatter={(v) => `৳${v / 1000}k`} width={44} />
+                    <YAxis tick={{ fontSize: 12, fill: '#6B7280' }} axisLine={false} tickLine={false} tickFormatter={(v) => `৳${v / 1000}k`} width={56} />
+                    {/* Invisible — only here so this chart computes the same domain/ticks as the real one alongside it. */}
+                    <Area dataKey="revenue" stroke="none" fill="none" />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
-              <div className="flex-1 min-w-0 overflow-x-auto sidebar-scroll">
+              <div ref={revenueScroll.ref} onScroll={revenueScroll.onScroll} className="flex-1 min-w-0 overflow-x-scroll chart-x-scroll">
                 <div style={{ minWidth: revenueData.length * MIN_TICK_WIDTH, width: '100%' }}>
                   <ResponsiveContainer width="100%" height={280}>
                     <AreaChart data={revenueData} margin={{ top: 5, right: 8, left: 0, bottom: 0 }}>
@@ -97,6 +111,7 @@ export default function AdminDashboard() {
               </div>
             </div>
           )}
+          {!revenueLoading && <ChartScrollBar thumbWidth={revenueScroll.metrics.thumbWidth} thumbLeft={revenueScroll.metrics.thumbLeft} />}
         </div>
 
         <div className="card-surface p-5">
@@ -125,14 +140,16 @@ export default function AdminDashboard() {
           <div className="h-65 grid place-items-center"><Loader2 size={24} className="animate-spin text-primary/40" /></div>
         ) : (
           <div className="flex">
-            <div className="shrink-0" style={{ width: 44 }}>
+            <div className="shrink-0" style={{ width: 56 }}>
               <ResponsiveContainer width="100%" height={260}>
                 <BarChart data={revenueData} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
-                  <YAxis tick={{ fontSize: 12, fill: '#6B7280' }} axisLine={false} tickLine={false} width={44} />
+                  <YAxis tick={{ fontSize: 12, fill: '#6B7280' }} axisLine={false} tickLine={false} width={56} />
+                  {/* Invisible — only here so this chart computes the same domain/ticks as the real one alongside it. */}
+                  <Bar dataKey="orders" fill="none" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
-            <div className="flex-1 min-w-0 overflow-x-auto sidebar-scroll">
+            <div ref={ordersScroll.ref} onScroll={ordersScroll.onScroll} className="flex-1 min-w-0 overflow-x-scroll chart-x-scroll">
               <div style={{ minWidth: revenueData.length * MIN_TICK_WIDTH, width: '100%' }}>
                 <ResponsiveContainer width="100%" height={260}>
                   <BarChart data={revenueData} margin={{ top: 5, right: 8, left: 0, bottom: 0 }}>
@@ -147,6 +164,7 @@ export default function AdminDashboard() {
             </div>
           </div>
         )}
+        {!revenueLoading && <ChartScrollBar thumbWidth={ordersScroll.metrics.thumbWidth} thumbLeft={ordersScroll.metrics.thumbLeft} />}
       </div>
 
       <div className="card-surface p-5">
