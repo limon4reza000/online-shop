@@ -52,7 +52,7 @@ const orderStatusLabels: Record<OrderStatus, string> = {
 
 export default function AdminDashboard() {
   const { data: summary, isLoading: summaryLoading } = useAnalyticsSummary();
-  const { data: revenueData = [], isLoading: revenueLoading } = useRevenueTrend(7);
+  const { data: revenueData = [], isLoading: revenueLoading } = useRevenueTrend(12, true);
   const { data: categoryData = [], isLoading: categoryLoading } = useCategorySales();
   const { data: recentOrders, isLoading: ordersLoading } = useAdminOrders({ page: 1, pageSize: 6 });
   const revenueScroll = useScrollTrack<HTMLDivElement>([revenueData.length]);

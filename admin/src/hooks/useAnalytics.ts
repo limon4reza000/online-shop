@@ -46,10 +46,11 @@ export interface RevenueTrendPoint {
   orders: number;
 }
 
-export function useRevenueTrend(months = 7) {
+export function useRevenueTrend(months = 7, calendarYear = false) {
   return useQuery({
-    queryKey: ['analytics', 'revenue-trend', months],
-    queryFn: async () => (await api.get<{ data: RevenueTrendPoint[] }>('/analytics/revenue-trend', { params: { months } })).data.data,
+    queryKey: ['analytics', 'revenue-trend', calendarYear ? 'calendar' : months],
+    queryFn: async () =>
+      (await api.get<{ data: RevenueTrendPoint[] }>('/analytics/revenue-trend', { params: calendarYear ? { calendarYear: true } : { months } })).data.data,
   });
 }
 

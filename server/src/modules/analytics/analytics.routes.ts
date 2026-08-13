@@ -54,10 +54,12 @@ analyticsRouter.get('/summary', asyncHandler(async (_req, res) => {
 }));
 
 // GET /api/analytics/revenue-trend?months=7 — paid revenue + order count per calendar month.
+// GET /api/analytics/revenue-trend?calendarYear=true — fixed জানুয়ারি..ডিসেম্বর of the current year instead of a trailing window.
 analyticsRouter.get('/revenue-trend', asyncHandler(async (req, res) => {
-  const months = Math.min(Number(req.query.months) || 7, 12);
+  const calendarYear = req.query.calendarYear === 'true';
+  const months = calendarYear ? 12 : Math.min(Number(req.query.months) || 7, 12);
   const now = new Date();
-  const rangeStart = new Date(now.getFullYear(), now.getMonth() - (months - 1), 1);
+  const rangeStart = calendarYear ? new Date(now.getFullYear(), 0, 1) : new Date(now.getFullYear(), now.getMonth() - (months - 1), 1);
 
   const orders = await prisma.order.findMany({
     where: { createdAt: { gte: rangeStart } },
@@ -65,9 +67,16 @@ analyticsRouter.get('/revenue-trend', asyncHandler(async (req, res) => {
   });
 
   const buckets: { key: string; label: string; revenue: number; orders: number }[] = [];
-  for (let i = months - 1; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    buckets.push({ key: `${d.getFullYear()}-${d.getMonth()}`, label: d.toLocaleDateString('bn-BD', { month: 'long' }), revenue: 0, orders: 0 });
+  if (calendarYear) {
+    for (let m = 0; m < 12; m++) {
+      const d = new Date(now.getFullYear(), m, 1);
+      buckets.push({ key: `${d.getFullYear()}-${d.getMonth()}`, label: d.toLocaleDateString('bn-BD', { month: 'long' }), revenue: 0, orders: 0 });
+    }
+  } else {
+    for (let i = months - 1; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      buckets.push({ key: `${d.getFullYear()}-${d.getMonth()}`, label: d.toLocaleDateString('bn-BD', { month: 'long' }), revenue: 0, orders: 0 });
+    }
   }
   const bucketByKey = new Map(buckets.map((b) => [b.key, b]));
 
