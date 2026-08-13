@@ -92,7 +92,7 @@ export default function AdminDashboard() {
               <div ref={revenueScroll.ref} onScroll={revenueScroll.onScroll} className="flex-1 min-w-0 overflow-x-auto no-scrollbar">
                 <div style={{ minWidth: revenueData.length * MIN_TICK_WIDTH, width: '100%' }}>
                   <ResponsiveContainer width="100%" height={280}>
-                    <AreaChart data={revenueData} margin={{ top: 5, right: 8, left: 0, bottom: 0 }}>
+                    <AreaChart data={revenueData} margin={{ top: 5, right: 40, left: 40, bottom: 0 }}>
                       <defs>
                         <linearGradient id="revGradient" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="5%" stopColor="#F778A1" stopOpacity={0.35} />
@@ -151,7 +151,7 @@ export default function AdminDashboard() {
             <div ref={ordersScroll.ref} onScroll={ordersScroll.onScroll} className="flex-1 min-w-0 overflow-x-auto no-scrollbar">
               <div style={{ minWidth: revenueData.length * MIN_TICK_WIDTH, width: '100%' }}>
                 <ResponsiveContainer width="100%" height={260}>
-                  <BarChart data={revenueData} margin={{ top: 5, right: 8, left: 0, bottom: 0 }}>
+                  <BarChart data={revenueData} margin={{ top: 5, right: 40, left: 40, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#F3D6E2" vertical={false} />
                     <XAxis dataKey="month" tick={<MonthTick />} interval={0} axisLine={false} tickLine={false} height={46} />
                     <YAxis hide width={0} />

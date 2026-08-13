@@ -83,7 +83,7 @@ export default function AdminReports() {
               <div ref={profitScroll.ref} onScroll={profitScroll.onScroll} className="flex-1 min-w-0 overflow-x-auto no-scrollbar">
                 <div style={{ minWidth: profitTrend.length * MIN_TICK_WIDTH, width: '100%' }}>
                   <ResponsiveContainer width="100%" height={280}>
-                    <LineChart data={profitTrend} margin={{ top: 5, right: 8, left: 0, bottom: 0 }}>
+                    <LineChart data={profitTrend} margin={{ top: 5, right: 40, left: 40, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#F3D6E2" vertical={false} />
                       <XAxis dataKey="week" tick={{ fontSize: 12, fill: '#6B7280' }} axisLine={false} tickLine={false} />
                       <YAxis hide width={0} />
