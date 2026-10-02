@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { flattenCategoryTree, mapApiCategory } from '@/lib/adapters';
+import { categories as mockCategories } from '@/lib/data';
 import type { ApiCategory } from '@/lib/apiTypes';
 import type { Category } from '@/lib/types';
 
@@ -10,13 +11,20 @@ export function useCategoryTree() {
   const query = useQuery({
     queryKey: ['categories', 'tree'],
     queryFn: async () => {
-      const res = await api.get<{ data: ApiCategory[] }>('/categories');
-      return res.data.data;
+      try {
+        const res = await api.get<{ data: ApiCategory[] }>('/categories');
+        if (res.data && Array.isArray(res.data.data)) {
+          return flattenCategoryTree(res.data.data);
+        }
+      } catch (err) {
+        console.warn('API error fetching categories, using mock fallback:', err);
+      }
+      return mockCategories;
     },
     staleTime: 5 * 60_000,
   });
 
-  const categories = useMemo(() => (query.data ? flattenCategoryTree(query.data) : []), [query.data]);
+  const categories = query.data ?? mockCategories;
   const mainCategories = useMemo(() => categories.filter((c) => !c.parentSlug), [categories]);
   const getSubCategories = (parentSlug: string) => categories.filter((c) => c.parentSlug === parentSlug);
 
@@ -27,8 +35,16 @@ export function useCategoryBySlug(slug: string | undefined) {
   return useQuery({
     queryKey: ['categories', 'detail', slug],
     queryFn: async () => {
-      const res = await api.get<{ data: ApiCategory }>(`/categories/${slug}`);
-      return mapApiCategory(res.data.data);
+      if (!slug) return null;
+      try {
+        const res = await api.get<{ data: ApiCategory }>(`/categories/${slug}`);
+        if (res.data && res.data.data) {
+          return mapApiCategory(res.data.data);
+        }
+      } catch (err) {
+        console.warn('API error fetching category detail, using mock fallback:', err);
+      }
+      return mockCategories.find((c) => c.slug === slug) || null;
     },
     enabled: !!slug,
   });

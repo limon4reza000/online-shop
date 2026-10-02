@@ -37,10 +37,10 @@ export default function Shop() {
   const [quickView, setQuickView] = useState<Product | null>(null);
 
   const { data: products = [], isLoading: loading } = useProducts();
-  const { categories: allCategories } = useCategoryTree();
-  const categories = useMemo(() => allCategories.filter((c) => c.parentSlug), [allCategories]);
+  const { categories: allCategories = [] } = useCategoryTree();
+  const categories = useMemo(() => (allCategories || []).filter((c) => c.parentSlug), [allCategories]);
   const { data: brandList = [] } = useBrands();
-  const brands = useMemo(() => brandList.map((b) => b.name), [brandList]);
+  const brands = useMemo(() => (brandList || []).map((b) => (typeof b === 'string' ? b : b.name)), [brandList]);
 
   const toggle = (list: string[], setList: (v: string[]) => void, value: string) => {
     setList(list.includes(value) ? list.filter((v) => v !== value) : [...list, value]);
@@ -126,7 +126,7 @@ export default function Shop() {
 
   return (
     <>
-      <Seo title="Shop All" description="আমাদের প্রিমিয়াম ফ্যাশন ও লাইফস্টাইল পণ্যের সম্পূর্ণ সংগ্রহ দেখুন।" />
+      <Seo title="Shop" description="আমাদের প্রিমিয়াম ফ্যাশন ও লাইফস্টাইল পণ্যের সম্পূর্ণ সংগ্রহ দেখুন।" />
       <PageHeader
         title="সব পণ্য"
         subtitle={shopSubtitles.length > 0 ? shopSubtitles : 'আমাদের প্রিমিয়াম ফ্যাশন ও লাইফস্টাইল পণ্যের সম্পূর্ণ সংগ্রহ দেখুন।'}

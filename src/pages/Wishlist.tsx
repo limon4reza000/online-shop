@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Heart, X } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { Seo } from '@/components/ui/Seo';
 import { Rating } from '@/components/ui/Rating';
 import { AddToCartControl } from '@/components/ui/AddToCartControl';
 import { useWishlist } from '@/context/WishlistContext';
@@ -15,6 +16,7 @@ export default function Wishlist() {
 
   return (
     <>
+      <Seo title="Wishlist" />
       <PageHeader title="আমার পছন্দের তালিকা" crumbs={[{ label: 'পছন্দের তালিকা' }]} showBack />
       <div className="container-app section-y">
         {items.length === 0 ? (

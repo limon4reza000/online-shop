@@ -2,6 +2,7 @@ import { Sparkles, Leaf, HeartHandshake, Globe2 } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { FadeIn } from '@/components/ui/FadeIn';
 import { CustomerReviews } from '@/components/sections/CustomerReviews';
+import { Seo } from '@/components/ui/Seo';
 
 const values = [
   { icon: Sparkles, title: 'প্রিমিয়াম মান', desc: 'প্রতিটি পণ্য অত্যন্ত যত্নসহকারে এবং প্রিমিয়াম উপকরণ দিয়ে তৈরি করা হয়।' },
@@ -13,6 +14,7 @@ const values = [
 export default function About() {
   return (
     <>
+      <Seo title="About" />
       <PageHeader title="আমাদের গল্প" crumbs={[{ label: 'আমাদের সম্পর্কে' }]} showBack />
 
       <div className="container-app section-y grid lg:grid-cols-2 gap-10 items-center">

@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { Minus, Plus, Trash2, ShoppingBag, Tag, ArrowRight, User, Phone, MapPin, StickyNote } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { Seo } from '@/components/ui/Seo';
 import { useCart, type ShippingDetails } from '@/context/CartContext';
 import { useProducts } from '@/hooks/useProducts';
 import { formatPrice } from '@/lib/format';
@@ -80,6 +81,7 @@ export default function Cart() {
 
   return (
     <>
+      <Seo title="Cart" />
       <PageHeader title="শপিং কার্ট" subtitle="চেকআউটের আগে আপনার পণ্যসমূহ পর্যালোচনা করুন।" crumbs={[{ label: 'কার্ট' }]} showBack />
       <div className="container-app section-y">
         {lineItems.length === 0 ? (

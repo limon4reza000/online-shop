@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Wallet, ShieldCheck, Send } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { Seo } from '@/components/ui/Seo';
 import { useCart } from '@/context/CartContext';
 import { useProducts } from '@/hooks/useProducts';
 import { useCreateOrder } from '@/hooks/useOrders';
@@ -122,6 +123,7 @@ export default function Checkout() {
 
   return (
     <>
+      <Seo title="Checkout" />
       <PageHeader title="চেকআউট" subtitle="নিরাপদ, দ্রুত এবং সহজ।" crumbs={[{ label: 'কার্ট', to: '/cart' }, { label: 'চেকআউট' }]} showBack />
 
       <div className="container-app pt-4 sm:pt-6 pb-14 sm:pb-20">

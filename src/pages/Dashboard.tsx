@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Package, Heart, MapPin, CreditCard, ArrowRight } from 'lucide-react';
+import { Seo } from '@/components/ui/Seo';
 import { useAuth } from '@/context/AuthContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { mockOrders, products } from '@/lib/data';
@@ -35,6 +36,7 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8">
+      <Seo title="Dashboard" />
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((s) => (
           <div key={s.label} className="card-surface p-5">

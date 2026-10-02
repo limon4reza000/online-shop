@@ -6,6 +6,7 @@ import { Rating } from '@/components/ui/Rating';
 import { ProductCard } from '@/components/ui/ProductCard';
 import { QuickViewModal } from '@/components/ui/QuickViewModal';
 import { FadeIn } from '@/components/ui/FadeIn';
+import { Seo } from '@/components/ui/Seo';
 import { useProduct, useRelatedProducts } from '@/hooks/useProducts';
 import { useCategoryTree } from '@/hooks/useCategories';
 import { usePublicStoreSettings } from '@/hooks/useSettings';
@@ -63,6 +64,7 @@ export default function ProductDetails() {
 
   return (
     <>
+      <Seo title={product.name} description={product.shortDescription || product.description} />
       <div className="sticky top-0 z-40 bg-white border-b border-border">
         <div className="container-app h-14 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">

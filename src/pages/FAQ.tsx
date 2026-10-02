@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { FadeIn } from '@/components/ui/FadeIn';
+import { Seo } from '@/components/ui/Seo';
 
 const faqs = [
   { q: 'আপনাদের শিপিং নীতি কী?', a: '৭৫ ডলারের বেশি সকল অর্ডারে আমরা বিনামূল্যে স্ট্যান্ডার্ড শিপিং প্রদান করি। সাধারণত অর্ডার ৩-৭ কর্মদিবসের মধ্যে পৌঁছে যায়। চেকআউটের সময় দ্রুত শিপিংয়ের সুবিধাও পাওয়া যায়।' },
@@ -19,6 +20,7 @@ export default function FAQ() {
 
   return (
     <>
+      <Seo title="FAQ" />
       <PageHeader title="সচরাচর জিজ্ঞাসিত প্রশ্ন" crumbs={[{ label: 'সচরাচর প্রশ্ন' }]} showBack />
       <div className="container-app section-y max-w-3xl">
         <div className="space-y-3">

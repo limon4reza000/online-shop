@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { FadeIn } from '@/components/ui/FadeIn';
+import { Seo } from '@/components/ui/Seo';
 import { useCategoryTree } from '@/hooks/useCategories';
 import { CategoryIcon } from '@/components/ui/CategoryIcon';
 
@@ -10,6 +11,7 @@ export default function Categories() {
 
   return (
     <>
+      <Seo title="Categories" />
       <PageHeader title="ক্যাটাগরি" subtitle="আপনার জন্য বিশেষভাবে সাজানো আমাদের কিউরেটেড সংগ্রহ দেখুন।" crumbs={[{ label: 'ক্যাটাগরি' }]} />
       <div className="container-app section-y">
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">

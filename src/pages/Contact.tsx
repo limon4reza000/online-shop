@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Mail, Phone, MapPin, Clock, Send } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { FadeIn } from '@/components/ui/FadeIn';
+import { Seo } from '@/components/ui/Seo';
 import { useToast } from '@/context/ToastContext';
 
 const info = [
@@ -23,6 +24,7 @@ export default function Contact() {
 
   return (
     <>
+      <Seo title="Contact" />
       <PageHeader title="যোগাযোগ করুন" subtitle="আমরা আপনার কথা শুনতে চাই। যেকোনো প্রশ্ন নিয়ে যোগাযোগ করুন।" crumbs={[{ label: 'যোগাযোগ' }]} showBack />
 
       <div className="container-app section-y grid lg:grid-cols-[1fr_1.3fr] gap-10">

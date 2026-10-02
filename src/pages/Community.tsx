@@ -11,7 +11,7 @@ export default function Community() {
 
   return (
     <>
-      <Seo title="কমিউনিটি" description="নিত্যঘর কমিউনিটিতে যুক্ত হয়ে সদস্যদের অভিজ্ঞতা, স্টাইল টিপস ও এক্সক্লুসিভ আপডেট দেখুন।" />
+      <Seo title="Community" description="নিত্যঘর কমিউনিটিতে যুক্ত হয়ে সদস্যদের অভিজ্ঞতা, স্টাইল টিপস ও এক্সক্লুসিভ আপডেট দেখুন।" />
       <PageHeader title="নিত্যঘর কমিউনিটিতে স্বাগতম" subtitle="হাজারো সদস্যের সাথে যুক্ত হয়ে স্টাইল টিপস, অভিজ্ঞতা এবং এক্সক্লুসিভ আপডেট শেয়ার করুন।" crumbs={[{ label: 'কমিউনিটি' }]} showBack />
 
       <div className="container-app section-y">

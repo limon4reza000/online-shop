@@ -40,7 +40,7 @@ export default function Register() {
 
   return (
     <div className="container-app section-y">
-      <Seo title="অ্যাকাউন্ট তৈরি করুন" description="এক্সক্লুসিভ সুবিধা, অফার এবং দ্রুত চেকআউটের জন্য নিত্যঘরে যুক্ত হোন।" />
+      <Seo title="Register" description="এক্সক্লুসিভ সুবিধা, অফার এবং দ্রুত চেকআউটের জন্য নিত্যঘরে যুক্ত হোন।" />
       <div className="max-w-md mx-auto card-surface p-8 sm:p-10">
         <div className="text-center mb-8">
           <h1 className="text-3xl">অ্যাকাউন্ট তৈরি করুন</h1>

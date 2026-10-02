@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Package, Lock } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { Seo } from '@/components/ui/Seo';
 import { useAuth } from '@/context/AuthContext';
 import { mockOrders, products } from '@/lib/data';
 import { formatPrice, formatDate } from '@/lib/format';
@@ -34,6 +35,7 @@ export default function MyOrders() {
   if (!user) {
     return (
       <>
+        <Seo title="Orders" />
         <PageHeader title="আমার অর্ডার" subtitle="আপনার আগের সব অর্ডার এক জায়গায় দেখুন।" crumbs={[{ label: 'অর্ডার' }]} showBack />
         <div className="container-app section-y">
           <EmptyState
@@ -52,6 +54,7 @@ export default function MyOrders() {
 
   return (
     <>
+      <Seo title="Orders" />
       <PageHeader title="আমার অর্ডার" subtitle="আপনার আগের সব অর্ডার এক জায়গায় দেখুন।" crumbs={[{ label: 'অর্ডার' }]} showBack />
       <div className="container-app section-y space-y-6">
       <div className="flex gap-2 overflow-x-auto no-scrollbar">

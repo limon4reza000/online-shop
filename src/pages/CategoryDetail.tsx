@@ -8,6 +8,7 @@ import { SkeletonCard } from '@/components/ui/SkeletonCard';
 import { QuickViewModal } from '@/components/ui/QuickViewModal';
 import { Pagination } from '@/components/ui/Pagination';
 import { FadeIn } from '@/components/ui/FadeIn';
+import { Seo } from '@/components/ui/Seo';
 import { useCategoryTree } from '@/hooks/useCategories';
 import { useProducts } from '@/hooks/useProducts';
 import { CategoryIcon } from '@/components/ui/CategoryIcon';
@@ -38,6 +39,7 @@ export default function CategoryDetail() {
   if (isMainCategory) {
     return (
       <>
+        <Seo title={category.name} />
         <PageHeader
           title={<span className="inline-flex items-center gap-2.5"><CategoryIcon name={category.icon} className="text-2xl" /> {category.name}</span>}
           crumbs={[{ label: category.name }]}
@@ -65,6 +67,7 @@ export default function CategoryDetail() {
 
   return (
     <>
+      <Seo title={category.name} />
       <PageHeader
         title={category.name}
         crumbs={parentCategory ? [{ label: parentCategory.name, to: `/categories/${parentCategory.slug}` }, { label: category.name }] : [{ label: category.name }]}

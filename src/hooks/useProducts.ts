@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { mapApiProduct, mapApiReview } from '@/lib/adapters';
+import { products as mockProducts } from '@/lib/data';
 import type { ApiProduct } from '@/lib/apiTypes';
 import type { Product } from '@/lib/types';
 
@@ -34,8 +35,37 @@ export function useProducts(filters: ProductFilters = {}, options: { enabled?: b
   const query = useQuery({
     queryKey: ['products', filters],
     queryFn: async () => {
-      const res = await api.get<Paginated<ApiProduct>>('/products', { params: { pageSize: 100, ...filters } });
-      return { items: res.data.data.map(mapApiProduct), meta: res.data.meta };
+      try {
+        const res = await api.get<Paginated<ApiProduct>>('/products', { params: { pageSize: 100, ...filters } });
+        if (res.data && Array.isArray(res.data.data)) {
+          return { items: res.data.data.map(mapApiProduct), meta: res.data.meta };
+        }
+      } catch (err) {
+        console.warn('API error fetching products, falling back to local mock data:', err);
+      }
+
+      let filtered = [...mockProducts];
+      if (filters.q) {
+        const q = filters.q.toLowerCase();
+        filtered = filtered.filter((p) => p.name.toLowerCase().includes(q));
+      }
+      if (filters.category) {
+        filtered = filtered.filter((p) => p.category === filters.category);
+      }
+      if (filters.brand) {
+        filtered = filtered.filter((p) => p.brand === filters.brand);
+      }
+      if (filters.minPrice !== undefined) {
+        filtered = filtered.filter((p) => p.price >= filters.minPrice!);
+      }
+      if (filters.maxPrice !== undefined) {
+        filtered = filtered.filter((p) => p.price <= filters.maxPrice!);
+      }
+
+      return {
+        items: filtered,
+        meta: { page: filters.page || 1, pageSize: filters.pageSize || 100, total: filtered.length, totalPages: 1 },
+      };
     },
     staleTime: 60_000,
     enabled: options.enabled,
@@ -47,10 +77,22 @@ export function useProduct(slug: string | undefined) {
   return useQuery({
     queryKey: ['product', slug],
     queryFn: async () => {
-      const res = await api.get<{ data: ApiProduct }>(`/products/${slug}`);
+      if (!slug) return null;
+      try {
+        const res = await api.get<{ data: ApiProduct }>(`/products/${slug}`);
+        if (res.data && res.data.data) {
+          return {
+            product: mapApiProduct(res.data.data),
+            reviews: (res.data.data.reviews ?? []).map(mapApiReview),
+          };
+        }
+      } catch (err) {
+        console.warn('API error fetching product details, using mock fallback:', err);
+      }
+      const found = mockProducts.find((p) => p.slug === slug) || mockProducts[0];
       return {
-        product: mapApiProduct(res.data.data),
-        reviews: (res.data.data.reviews ?? []).map(mapApiReview),
+        product: found,
+        reviews: [],
       };
     },
     enabled: !!slug,
@@ -61,8 +103,17 @@ export function useRelatedProducts(slug: string | undefined) {
   return useQuery({
     queryKey: ['product', slug, 'related'],
     queryFn: async () => {
-      const res = await api.get<{ data: ApiProduct[] }>(`/products/${slug}/related`);
-      return res.data.data.map(mapApiProduct);
+      if (!slug) return [];
+      try {
+        const res = await api.get<{ data: ApiProduct[] }>(`/products/${slug}/related`);
+        if (res.data && Array.isArray(res.data.data)) {
+          return res.data.data.map(mapApiProduct);
+        }
+      } catch (err) {
+        console.warn('API error fetching related products, using mock fallback:', err);
+      }
+      const target = mockProducts.find((p) => p.slug === slug);
+      return mockProducts.filter((p) => p.slug !== slug && (!target || p.category === target.category)).slice(0, 4);
     },
     enabled: !!slug,
   });

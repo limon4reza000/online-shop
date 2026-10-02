@@ -1,4 +1,5 @@
 import { PageHeader } from '@/components/ui/PageHeader';
+import { Seo } from '@/components/ui/Seo';
 
 const sections = [
   { title: '১. শর্তাবলী গ্রহণ', body: 'নিত্যঘর ব্যবহার এবং প্রবেশের মাধ্যমে, আপনি এই চুক্তির শর্তাবলী ও বিধান মেনে চলতে সম্মত হচ্ছেন। আপনি যদি এতে সম্মত না হন, তাহলে অনুগ্রহ করে আমাদের সেবা ব্যবহার করবেন না।' },
@@ -16,6 +17,7 @@ const sections = [
 export default function Terms() {
   return (
     <>
+      <Seo title="Terms" />
       <PageHeader title="শর্তাবলী" subtitle="সর্বশেষ হালনাগাদ: ১ জানুয়ারি, ২০২৬" crumbs={[{ label: 'শর্তাবলী' }]} />
       <div className="container-app section-y max-w-3xl space-y-8">
         {sections.map((s) => (

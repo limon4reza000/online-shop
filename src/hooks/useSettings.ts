@@ -7,8 +7,15 @@ export function usePublicStoreSettings() {
   return useQuery({
     queryKey: ['settings', 'store', 'public'],
     queryFn: async () => {
-      const res = await api.get<{ data: StoreSettings }>('/settings/store');
-      return res.data.data;
+      try {
+        const res = await api.get<{ data: StoreSettings }>('/settings/store');
+        if (res.data && res.data.data) {
+          return res.data.data;
+        }
+      } catch (err) {
+        console.warn('API error fetching store settings:', err);
+      }
+      return null;
     },
     staleTime: 5 * 60_000,
     retry: 1,

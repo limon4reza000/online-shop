@@ -17,7 +17,7 @@ export default function SearchResults() {
 
   return (
     <>
-      <Seo title={q ? `"${q}" এর জন্য অনুসন্ধান ফলাফল` : 'অনুসন্ধান'} description="সম্পূর্ণ নিত্যঘর ক্যাটালগে অনুসন্ধান করুন।" />
+      <Seo title={q || 'Search'} description="সম্পূর্ণ নিত্যঘর ক্যাটালগে অনুসন্ধান করুন।" />
 
       <div className="container-app section-y">
         <button

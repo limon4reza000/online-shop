@@ -1,4 +1,5 @@
 import { PageHeader } from '@/components/ui/PageHeader';
+import { Seo } from '@/components/ui/Seo';
 
 const sections = [
   { title: '১. আমরা যে তথ্য সংগ্রহ করি', body: 'আপনি যখন একটি অ্যাকাউন্ট তৈরি করেন বা অর্ডার দেন, তখন আপনি সরাসরি আমাদের যে তথ্য প্রদান করেন—যেমন আপনার নাম, ইমেইল ঠিকানা, শিপিং ঠিকানা এবং পেমেন্ট তথ্য—আমরা তা সংগ্রহ করি। এছাড়াও আমরা স্বয়ংক্রিয়ভাবে আপনার ডিভাইস এবং আমাদের সাইট ব্যবহারের কিছু নির্দিষ্ট তথ্যও সংগ্রহ করি।' },
@@ -14,6 +15,7 @@ const sections = [
 export default function Privacy() {
   return (
     <>
+      <Seo title="Privacy" />
       <PageHeader title="গোপনীয়তা নীতি" subtitle="সর্বশেষ হালনাগাদ: ১ জানুয়ারি, ২০২৬" crumbs={[{ label: 'গোপনীয়তা নীতি' }]} />
       <div className="container-app section-y max-w-3xl space-y-8">
         {sections.map((s) => (

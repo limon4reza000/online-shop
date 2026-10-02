@@ -9,6 +9,7 @@ import { RecentlyViewedHome } from '@/components/sections/RecentlyViewedHome';
 import { FeaturedBrands } from '@/components/sections/FeaturedBrands';
 import { QuickViewModal } from '@/components/ui/QuickViewModal';
 import { CategoryIcon } from '@/components/ui/CategoryIcon';
+import { Seo } from '@/components/ui/Seo';
 import { useProducts } from '@/hooks/useProducts';
 import { useCategoryTree } from '@/hooks/useCategories';
 import { useLanguage } from '@/context/LanguageContext';
@@ -54,6 +55,7 @@ export default function Home() {
 
   return (
     <>
+      <Seo title="Home" />
       <Hero />
       <PromoPills />
       <FeaturedBrands />

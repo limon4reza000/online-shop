@@ -6,6 +6,7 @@ import { ProductCard } from '@/components/ui/ProductCard';
 import { SkeletonCard } from '@/components/ui/SkeletonCard';
 import { QuickViewModal } from '@/components/ui/QuickViewModal';
 import { Pagination } from '@/components/ui/Pagination';
+import { Seo } from '@/components/ui/Seo';
 import { useBrandBySlug } from '@/hooks/useBrands';
 import { useProducts } from '@/hooks/useProducts';
 import type { Product } from '@/lib/types';
@@ -29,6 +30,7 @@ export default function BrandDetail() {
 
   return (
     <>
+      <Seo title={brand.name} />
       <PageHeader title={brand.name} crumbs={[{ label: 'শপ', to: '/shop' }, { label: brand.name }]} centerBack />
       {brand.banner && (
         <section className="pt-1 sm:pt-2 pb-5">
